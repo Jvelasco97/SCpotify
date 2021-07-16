@@ -14,8 +14,8 @@
 // holds the received data from the packets
 struct json_data {
   char *data;
-  size_t size;
-  size_t realsize;
+  size_t current_size;
+  size_t allocated_max_size;
 };
 
 // put parsed song information because strings are scary in C, and it helps in the long run
@@ -37,7 +37,7 @@ void inser_node(char* song_info, ssize_t size) {
   struct song_info_node *node = (struct song_info_node*) malloc(sizeof(struct song_info_node));
 
   // allocate 40 charactes, more of less if u want
-  char *dest = malloc(sizeof(char) * 40);
+  char *dest = malloc(sizeof(char) * size);
 
   // copy the info into a new address space
   memcpy(dest, song_info, size);
@@ -89,6 +89,8 @@ void free_heap() {
     ptr = ptr->next;
     free(temp);
   }
+
+  head = NULL;
 }
 
 /**
@@ -110,8 +112,8 @@ size_t StoreData(char *contents, size_t size, size_t nmemb, void *user_struct)
 
   // basically if the max size - current size = availabke space is less than than the 
   // new packet size, then reallocate
-  if (json_res->realsize - json_res->size <= realsize) {
-    char *new_mem_ptr = realloc(json_res->data, json_res->realsize += realsize * 2);
+  if (json_res->allocated_max_size - json_res->current_size <= realsize) {
+    char *new_mem_ptr = realloc(json_res->data, json_res->allocated_max_size += realsize * 2);
 
     if (new_mem_ptr == NULL) {
       fprintf(stderr, "not enough memory (realloc returned NULL)\n");
@@ -122,11 +124,11 @@ size_t StoreData(char *contents, size_t size, size_t nmemb, void *user_struct)
   }
 
   // slap the packet to the object
-  memcpy(&(json_res->data[json_res->size]), contents, realsize);
+  memcpy(&(json_res->data[json_res->current_size]), contents, realsize);
   // update current size of the buffer for the object
-  json_res->size += realsize;
+  json_res->current_size += realsize;
   // terminate the string as defined functions dont do it for us
-  json_res->data[json_res->size] = 0;
+  json_res->data[json_res->current_size] = 0;
 
   return realsize;
 }
@@ -147,9 +149,6 @@ ssize_t cut(char *artist_info) {
     artist_info++;
   }
 
-  if(*artist_info == '\0')
-    return 0;
-
   return distance;
 }
 
@@ -162,8 +161,8 @@ int main (int argc, char *argv[], char * envp[]) {
 
   struct json_data web_data;
   web_data.data = malloc(sizeof(char) * 16);
-  web_data.size = 0;
-  web_data.realsize = 16;
+  web_data.current_size = 0;
+  web_data.allocated_max_size = 16;
 
   // gets the header + token from your system enviroment variables, 
   // TODO - ADD, read from .env file instead of system
@@ -173,7 +172,8 @@ int main (int argc, char *argv[], char * envp[]) {
   headers = curl_slist_append(headers, "Content-Type: application/json");
   headers = curl_slist_append(headers, "charset: utf-8"); 
   // gets refreshed like every 40 minutes lol
-  headers = curl_slist_append(headers, auth_header); 
+  // it gets refreshed, i dont care
+  headers = curl_slist_append(headers, "Authorization: Bearer BQDKG-T0mAQWdH9xOr0Gb0BXeLC52EpgYmAso9BvKPq9neHIsqvG7TDvBfYjSQKa3exB1MhWIQyHvN5FGtX2TFWIzwpQ4tXgTdoBM-ESyniN4vgM-qHIAUvNJmMkKyBFNCA2ABCgg6BvLFTjhMrc7a5gPYqnJ6yngBdYKZ1j"); 
   curl = curl_easy_init();
 
   if (curl) {
