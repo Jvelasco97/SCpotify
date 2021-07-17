@@ -1,5 +1,6 @@
 #include "spotify_structs.h"
 #include "spotify_http.h"
+#include "token.h"
 
 char *GET_currently_playing() {
   CURL *curl;
@@ -20,8 +21,7 @@ char *GET_currently_playing() {
   headers = curl_slist_append(headers, "charset: utf-8"); 
 
   /* gets refreshed like every 40 minutes lol */
-  /* it gets refreshed, i dont care */
-  headers = curl_slist_append(headers, "Authorization: Bearer BQA3GaUGJOXVmjuukRI9O7TxgXWpzwpbSX6jZb9uKMXU_chGosmuVeW57bh5hUNMVQt2D5AhCeyLzMm793jxcCZQfZWPMMnt2rhGscrAVjBCBXGHGFJ8dQMB8CR_tgaU7rtioJJydaWdeDtscqgpQwSiKcpkwR_C6XWCJ6eyyY3RhugurlXnKt0vi__XnQqhKUJeZsK8uVq78mKIcTsarjj8Sr-Hu1gqH3s1sOeFfNQHNEfpANgz2IAiuleREgWegZXGFRpRgrOaNo0QTwYuWdViD9CxnU4Ns_VfT8_iBSe2"); 
+  headers = curl_slist_append(headers, token); 
   curl = curl_easy_init();
 
   if (curl) {

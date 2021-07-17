@@ -1,7 +1,8 @@
 #ifndef SPOTIFY_STRUCTS_H
 #define SPOTIFY_STRUCTS_H
 
-#include "includes.h"
+/* #include "includes.h" */
+#include <stdlib.h>
 
 struct json_data;
 struct song_info_node;
