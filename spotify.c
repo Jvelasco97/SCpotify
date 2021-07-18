@@ -7,12 +7,57 @@
  */
 #include "main_includes.h"
 
-/* static struct song_info_node *head = NULL; */
+enum request_type{PUT, POST};
 
-int main (int argc, char *argv[], char * envp[]) {
+char* process_args(int argc, char **argv, int *flag) {
+	int choice;
 
-  char *current_song_info = GET_currently_playing(); 
+	while ((choice = getopt(argc, argv, "prnb")) != EOF) {
+		switch(choice) {
+    /* pause player */
+		case 'p':
+      printf("Now pausing\n");
+      *flag = PUT;
+      return "pause";
+			break;
+    /* resume player */
+		case 'r':
+      printf("Now resuming\n");
+      *flag = PUT;
+      return "play";
+			break;
+    /* next track */
+		case 'n':
+      printf("Playing next track\n");
+      *flag = POST;
+      return "next";
+			break;
+    /* prev track */
+		case 'b':
+      printf("Playing previous track\n");
+      *flag = POST;
+      return "previous";
+			break;
+    /* unknown opt */
+		default:
+			return NULL;
+		}
+	}
 
+	return NULL;
+}
+
+int main (int argc, char **argv) {
+
+
+  int request_flag;
+
+  char *opt = process_args(argc, argv, &request_flag);
+
+  if(opt)
+    change_player_status(opt, &request_flag);
+
+  char *current_song_info = display_currently_playing(); 
   parse_currently_playing(current_song_info);
 
   printList();

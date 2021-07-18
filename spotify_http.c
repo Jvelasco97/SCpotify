@@ -1,8 +1,9 @@
 #include "spotify_structs.h"
 #include "spotify_http.h"
 #include "token.h"
+#include <string.h>
 
-char *GET_currently_playing() {
+char* display_currently_playing() {
   CURL *curl;
   CURLcode res;
   struct curl_slist *headers=NULL;
@@ -45,6 +46,56 @@ char *GET_currently_playing() {
   curl_slist_free_all(headers);
 
   return web_data.data;
+}
+
+void change_player_status(char *opt, int *request_flag) {
+  CURL *curl;
+  CURLcode res;
+  struct curl_slist *headers=NULL;
+
+  char* jsonObj = "{}";
+  char* SPOTIFY_PLAYER_URL = "https://api.spotify.com/v1/me/player/";
+
+  char * endpoint ;
+
+  if((endpoint = malloc(strlen(SPOTIFY_PLAYER_URL)+strlen(opt)+1)) != NULL) {
+    endpoint[0] = '\0';   
+
+    strcat(endpoint,SPOTIFY_PLAYER_URL);
+
+    strcat(endpoint,opt);
+  } else {
+      printf("malloc failed!\n");
+  }
+
+  headers = curl_slist_append(headers, "Accept: application/json");  
+  headers = curl_slist_append(headers, "Content-Type: application/json");
+  headers = curl_slist_append(headers, "charset: utf-8"); 
+
+  /* gets refreshed like every 40 minutes lol */
+  headers = curl_slist_append(headers, token); 
+  curl = curl_easy_init();
+
+  char* request_type = "PUT";
+
+  if(*request_flag == 1)
+    request_type = "POST";
+
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, request_type);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonObj);
+    curl_easy_setopt(curl, CURLOPT_URL, endpoint);
+
+    res = curl_easy_perform(curl);
+
+    if (CURLE_OK == res) { 
+      char *ct;         
+      res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct);
+    }
+  }
+
+  curl_slist_free_all(headers);
 }
 
 size_t StoreData(char *contents, size_t size, size_t nmemb, void *user_struct) {

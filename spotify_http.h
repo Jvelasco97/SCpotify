@@ -4,6 +4,7 @@
 #include "includes.h"
 
 size_t StoreData(char *contents, size_t size, size_t nmemb, void *user_struct);
-char *GET_currently_playing();
+char *display_currently_playing();
+void change_player_status(char *, int *);
 
 #endif

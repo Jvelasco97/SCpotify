@@ -1,4 +1,4 @@
-CFLAGS = -Wall -lcurl -Werror
+CFLAGS = -Wall -lcurl
 
 all: spotifyC
 
