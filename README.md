@@ -15,11 +15,11 @@ I wrote a small script with `cronie` as the daemon for the cronjob.
 ![sample 2](samples/2021-07-15_18-34_1.png)
 
 ### TODO
-[] free the heap from search songs in spotify_ll.c
-[] add more documentation
-[] fix whatever else I put in the code documentation
-[] add error checking
+[] free the heap from search songs in spotify_ll.c  
+[] add more documentation  
+[] fix whatever else I put in the code documentation  
+[] add error checking  
 [] add colors
 
-### Optional
+### Optional  
 [] use make for some of the automation
