@@ -14,12 +14,27 @@ I wrote a small script with `cronie` as the daemon for the cronjob.
 ![sample 1](samples/2021-07-15_18-34.png)
 ![sample 2](samples/2021-07-15_18-34_1.png)
 
+#### sample commands
+`spotifyC -n`
+Will play the next song
+`spotifyC -b`
+Will play the previous song
+`spotifyC -p`
+Will pause the song
+`spotifyC -r`
+Will reseume the song
+  
+`spotifyC -s "example song"`
+Will search and prompt  
+
+![sample 3](samples/2021-07-26_17-34.png)
+
 ### TODO
-[] free the heap from search songs in spotify_ll.c  
-[] add more documentation  
-[] fix whatever else I put in the code documentation  
-[] add error checking  
-[] add colors
+[X] free the heap from search songs in spotify_ll.c  
+[X] add more documentation  
+[ ] fix whatever else I put in the code documentation  
+[ ] add error checking  
+[X] add colors
 
 ### Optional  
-[] use make for some of the automation
+[ ] use make for some of the automation

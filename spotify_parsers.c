@@ -40,6 +40,7 @@ parse_currently_playing(char *json_web_data)
   }
 }
 
+/* TODO - get appropiate sizes */
 void 
 parse_search_info(char *json_web_data) 
 {

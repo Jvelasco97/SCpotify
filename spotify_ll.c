@@ -1,6 +1,7 @@
 #include "spotify_ll.h"
 #include "spotify_http.h"
 #include "spotify_structs.h"
+#include "colors.h"
 
 static struct 
 song_info_node *head = NULL;
@@ -37,10 +38,18 @@ insert_node(char* song_info, ssize_t size)
   head = node;
 }
 
+/**
+ * insert into the linked list of available songs
+ * @param album_info - the id of the album
+ * @param artist_info - artist name for display purposes
+ * @param track_position - the position of the song in the album
+ * @param song_info - song title for display purposes
+ */
 void 
 insert_search_node(char *album_info, char *artist_info, char *track_position, char *song_title) 
 {
-  struct available_song_node *node = (struct available_song_node*) malloc(sizeof(struct available_song_node));
+  struct available_song_node *node = 
+  (struct available_song_node*) malloc(sizeof(struct available_song_node));
 
   node->album_api_info = album_info;
   node->artist_info = artist_info;
@@ -71,7 +80,8 @@ void printList() {
 
 
 /**
- * prints all the nodes strings, has the parantheses wrapping
+ * prints all the available songs and then asks the user what
+ * song to play based on index
  * around them
  */
 
@@ -80,20 +90,30 @@ print_avaible_songs()
 {
   struct available_song_node *ptr = available_node;
 
-  int counter = 0;
+  /* used to point to the node that we want album info from */
+  u_int8_t counter = 0;
+
+  /* TODO - call the play_song method in main */
+  /* params for play_song */
   char *album_id;
   char *album_position;
 
+  /* display available songs */
   while(ptr != NULL) {
-    printf("[%d] %s by %s\n", counter++,ptr->song_title, ptr->artist_info);
+    printf("%s[%d]%s %s%s%s by %s%s%s\n",
+	   "\x1B[36m",counter++,"\x1B[0m",
+	   "\x1B[31m",ptr->song_title,"\x1B[0m",
+	   "\x1B[33m",ptr->artist_info,"\x1B[0m");
     ptr = ptr->next;
   }
 
+  /* reset so we can fetch the index position */
   ptr = available_node;
   counter = 0;
   
+  /* ask what song we want to play*/
   int choice;
-  printf("Play which song? ");
+  printf("\nPlay which song? ");
   scanf("%d", &choice);
 
   while(ptr != NULL) {
@@ -109,6 +129,8 @@ print_avaible_songs()
 
   play_song(album_id, album_position);
 
+  /* TODO */
+  /* turn to void and return pointers */
   return album_id;
 }
 
@@ -119,7 +141,6 @@ print_avaible_songs()
 void 
 clear_linked_list() 
 {
-  
   /* we dont want to mess with the actual head */
   struct song_info_node *ptr = head; 
   
@@ -139,4 +160,36 @@ clear_linked_list()
   }
 
   head = NULL;
+}
+
+/**
+ * frees all heap memory
+ */
+
+void 
+clear_search_list() 
+{
+  
+  /* we dont want to mess with the actual head */
+  struct available_song_node *ptr = available_node; 
+  
+  /* holds the node that will be deleted */
+  struct available_song_node *temp; 
+
+  /* as long as we are referencing something, do it */
+  while(ptr) {
+    /* free the data, or else it just sits there */
+    free(ptr->album_api_info);
+    free(ptr->album_position);
+    free(ptr->artist_info);
+    free(ptr->song_title);
+
+    /* poit to be deleted node, point to the next head, */
+    /* then delete */
+    temp = ptr;
+    ptr = ptr->next;
+    free(temp);
+  }
+
+  available_node = NULL;
 }

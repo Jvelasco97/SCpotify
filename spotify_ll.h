@@ -8,5 +8,6 @@ void insert_search_node(char *, char *, char *, char *);
 void printList();
 char* print_avaible_songs();
 void clear_linked_list();
+void clear_search_list();
 
 #endif
