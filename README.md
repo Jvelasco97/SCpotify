@@ -16,15 +16,18 @@ I wrote a small script with `cronie` as the daemon for the cronjob.
 
 #### sample commands
 `spotifyC -n`
-Will play the next song
+Will play the next song  
+
 `spotifyC -b`
-Will play the previous song
+Will play the previous song  
+
 `spotifyC -p`
-Will pause the song
+Will pause the song  
+
 `spotifyC -r`
-Will reseume the song
+Will reseume the song  
   
-`spotifyC -s "example song"`
+`spotifyC -s "example song"`  
 Will search and prompt  
 
 ![sample 3](samples/2021-07-26_17-34.png)
