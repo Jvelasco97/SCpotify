@@ -3,9 +3,19 @@
 
 /* #include "includes.h" */
 #include <stdlib.h>
+#include <stdbool.h>
 
+struct args_type;
 struct json_data;
 struct song_info_node;
+struct available_song_node;
+
+/* comand line arguements types */
+struct args_type {
+  bool display_song;
+  bool modify_player;
+  bool modify_change_song;
+};
 
 /* holds the received data from the packets */
 struct json_data {
@@ -18,6 +28,14 @@ struct json_data {
 struct song_info_node {
    char* data;
    struct song_info_node *next;
+};
+
+struct available_song_node {
+  char* album_api_info;
+  char* artist_info;
+  char* album_position;
+  char* song_title;
+  struct available_song_node *next;
 };
 
 #endif

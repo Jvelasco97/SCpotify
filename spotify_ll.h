@@ -3,8 +3,10 @@
 
 #include "includes.h"
 
-void insert_node(char* song_info, ssize_t size);
+void insert_node(char *, ssize_t size);
+void insert_search_node(char *, char *, char *, char *);
 void printList();
+char* print_avaible_songs();
 void clear_linked_list();
 
 #endif
