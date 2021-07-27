@@ -9,6 +9,7 @@ struct args_type;
 struct json_data;
 struct song_info_node;
 struct available_song_node;
+struct search_song_request;
 
 /* comand line arguements types */
 struct args_type {
@@ -26,16 +27,23 @@ struct json_data {
 
 /* put parsed song information because strings are scary in C, and it helps in the long run */
 struct song_info_node {
-   char* data;
+   char *data;
    struct song_info_node *next;
 };
 
+/* holds all the info for the node whhich displays what info we have available */
 struct available_song_node {
-  char* album_api_info;
-  char* artist_info;
-  char* album_position;
-  char* song_title;
+  char *album_api_info;
+  char *artist_info;
+  char *album_position;
+  char *song_title;
   struct available_song_node *next;
+};
+
+/* holds info about the parsed json that we want to play the track for */
+struct search_song_request {
+  char *track_info;
+  char *track_position;
 };
 
 #endif

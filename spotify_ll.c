@@ -1,5 +1,4 @@
 #include "spotify_ll.h"
-#include "spotify_http.h"
 #include "spotify_structs.h"
 #include "colors.h"
 
@@ -85,7 +84,7 @@ void printList() {
  * around them
  */
 
-char * 
+struct search_song_request 
 print_avaible_songs() 
 {
   struct available_song_node *ptr = available_node;
@@ -95,8 +94,10 @@ print_avaible_songs()
 
   /* TODO - call the play_song method in main */
   /* params for play_song */
-  char *album_id;
-  char *album_position;
+  /* char *album_id; */
+  /* char *album_position; */
+
+  struct search_song_request req_node;
 
   /* display available songs */
   while(ptr != NULL) {
@@ -118,8 +119,8 @@ print_avaible_songs()
 
   while(ptr != NULL) {
     if(counter == choice) {
-      album_id = ptr->album_api_info;
-      album_position = ptr->album_position;
+      req_node.track_info = ptr->album_api_info;
+      req_node.track_position = ptr->album_position;
       break;
     }
 
@@ -127,11 +128,9 @@ print_avaible_songs()
     ptr = ptr->next;
   }
 
-  play_song(album_id, album_position);
-
   /* TODO */
   /* turn to void and return pointers */
-  return album_id;
+  return req_node;
 }
 
 /**

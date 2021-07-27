@@ -86,8 +86,11 @@ main (int argc, char **argv)
     /* perform curl with endpoint @ search */
     json_res = get_json_from_server(opt); 
     parse_search_info(json_res);
-    print_avaible_songs();
+    struct search_song_request req = print_avaible_songs();
+    play_song(req.track_info, req.track_position);
     clear_search_list ();
+    /* free the json response from get_json_from_server */
+    free(json_res);
   } else if (cmd_args.modify_player) {
     /* perform curl with enndpoint to modify player */
     change_player_status(opt, req_type); 
@@ -97,6 +100,8 @@ main (int argc, char **argv)
     parse_currently_playing(json_res);
     printList();
     clear_linked_list();
+    /* free the json response from get_json_from_server */
+    free(json_res);
   }
 
   return 0;

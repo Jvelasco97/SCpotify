@@ -38,6 +38,7 @@ parse_currently_playing(char *json_web_data)
     /* the flag is enabled for the remainder of the loop */
     skipped_extra = 1;
   }
+
 }
 
 /* TODO - get appropiate sizes */
