@@ -14,17 +14,19 @@ I wrote a small script with `cronie` as the daemon for the cronjob.
 ![sample 1](samples/2021-07-15_18-34.png)
 ![sample 2](samples/2021-07-15_18-34_1.png)
 
+you need to follow the guide [here](https://developer.spotify.com/documentation/general/guides/authorization-guide/) to setup your refresh token.
+
 #### sample commands
-`spotifyC -n`
+`spotifyC -n`  
 Will play the next song  
 
-`spotifyC -b`
+`spotifyC -b`  
 Will play the previous song  
 
-`spotifyC -p`
+`spotifyC -p`  
 Will pause the song  
 
-`spotifyC -r`
+`spotifyC -r`  
 Will reseume the song  
   
 `spotifyC -s "example song"`  
