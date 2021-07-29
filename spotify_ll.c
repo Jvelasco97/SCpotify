@@ -92,7 +92,6 @@ print_avaible_songs()
   /* used to point to the node that we want album info from */
   u_int8_t counter = 0;
 
-  /* TODO - call the play_song method in main */
   /* params for play_song */
   /* char *album_id; */
   /* char *album_position; */
@@ -115,7 +114,13 @@ print_avaible_songs()
   /* ask what song we want to play*/
   int choice;
   printf("\nPlay which song? ");
-  scanf("%d", &choice);
+
+  do{
+    scanf("%d", &choice);
+    if(!(choice > 0 && choice < 5 )) {
+      printf("\nplease enter the a valid range: ");
+    }
+  } while(choice < 0 || choice > 4);
 
   while(ptr != NULL) {
     if(counter == choice) {
@@ -128,8 +133,6 @@ print_avaible_songs()
     ptr = ptr->next;
   }
 
-  /* TODO */
-  /* turn to void and return pointers */
   return req_node;
 }
 

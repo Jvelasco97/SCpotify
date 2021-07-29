@@ -35,9 +35,6 @@ Will search and prompt
 ![sample 3](samples/2021-07-26_17-34.png)
 
 ### TODO
-[X] free the heap from search songs in spotify_ll.c  
-[X] add more documentation  
-[ ] fix whatever else I put in the code documentation  
 [ ] add error checking  
 [X] add colors
 

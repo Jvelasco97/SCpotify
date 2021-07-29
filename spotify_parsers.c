@@ -7,7 +7,7 @@ void
 parse_currently_playing(char *json_web_data) 
 {
   /* search pattern & ignore flag */
-  const char json_parse_string[] = "name";
+  const char *json_parse_string = "name";
   bool skipped_extra = 0;
 
   char *json_position = json_web_data;
@@ -17,14 +17,14 @@ parse_currently_playing(char *json_web_data)
   while ((json_position = strstr(json_position, json_parse_string))) {
 
     /* adjust new starting point */
-    json_position = &(json_position[sizeof(json_parse_string) - 1]);
+    json_position = &(json_position[strlen(json_parse_string) - 1]);
 
     ssize_t distance = cut(json_position);
 
     /* temporarely terminate the string so it can be copied in the node */
     json_position[distance - 1] = 0;
 
-    /* skips over unwanted charactes, -- TODO -FIX */
+    /* add offset of 5 characters */
     char *ptr = json_position + 5;
 
     /* strstr gets an unwanted field, cannot be ignored because the */
@@ -41,7 +41,6 @@ parse_currently_playing(char *json_web_data)
 
 }
 
-/* TODO - get appropiate sizes */
 void 
 parse_search_info(char *json_web_data) 
 {
@@ -51,55 +50,61 @@ parse_search_info(char *json_web_data)
   const char *find_artist = "\"name\"";
   const char *find_song = "\"is_local\"";
 
+  ssize_t distance = 0;
+
   char *json_position = json_web_data;
 
   /* searches the whole string and finds the sub string
    returns pointer to the beggining of the found string */
   while ((json_position = strstr(json_position, json_album_info))) {
 
+    /* the reason we cut off at 36 is because that's how long the */
+    /* album string is */
     json_position[36] = '\0';
     char* node_album_info = malloc(sizeof(char) * 36);
     memcpy(node_album_info, json_position, 36);
+    /* resume parsing the json response */
     json_position[36] = ' ';
     /* adjust new starting point */
     json_position = &(json_position[strlen(json_album_info) - 1]);
 
-    json_position[36] = ' ';
-
-    char* node_artist_info = malloc(sizeof(char) * 36);
+    char* node_artist_info;
     while((json_position = strstr(json_position,find_artist))) {
       json_position = &(json_position[strlen(find_artist) - 1]);
-      ssize_t distance = cut(json_position);
+      distance = cut(json_position);
+      node_artist_info = malloc(sizeof(char) * distance);
       json_position[distance] = 0;
-      memcpy(node_artist_info, json_position+4, 36);
+      /* offset of 4 because of some garbage chars we don't want */
+      memcpy(node_artist_info, json_position+4, distance);
       json_position[distance] = ' ';
       break;
     }
 
+    /* we have this to skip an unwanted object in the json response */
     while((json_position = strstr(json_position,find_song))) {
       json_position = &(json_position[strlen(find_song) - 1]);
-      ssize_t distance = cut(json_position);
-      json_position[distance] = 0;
-      json_position[distance] = ' ';
       break;
     }
 
-    char* node_song_title = malloc(sizeof(char) * 36);
+    char* node_song_title;
     while((json_position = strstr(json_position,find_artist))) {
       json_position = &(json_position[strlen(find_artist) - 1]);
-      ssize_t distance = cut(json_position);
+      distance = cut(json_position);
+      node_song_title = malloc(sizeof(char) * distance);
       json_position[distance] = 0;
-      memcpy(node_song_title, json_position+4, 36);
+      /* offset of 4 because of some garbage chars we don't want */
+      memcpy(node_song_title, json_position+4, distance);
       json_position[distance] = ' ';
       break;
     }
 
-    char* node_track_position = malloc(sizeof(char) + 1);
+    char* node_track_position;
     while((json_position = strstr(json_position, json_track_position))) {
       json_position = &(json_position[strlen(json_track_position) - 1]);
-      ssize_t distance = cut(json_position);
+      distance = cut(json_position);
       json_position[distance] = 0;
-      memcpy(node_track_position, json_position+4, 2);
+      node_track_position = malloc(sizeof(char) + distance);
+      memcpy(node_track_position, json_position+4, distance);
       json_position[distance] = ' ';
       break;
     }
@@ -116,14 +121,16 @@ parse_search_info(char *json_web_data)
 ssize_t 
 cut(char *artist_info) 
 {
-
   ssize_t distance = 0;
-  /* TODO - FIX, maybe delimeter = /,"/? */
-  char delimeter = ',';
 
-  while(*artist_info && *artist_info != delimeter) {
+  /* 100 because that's the biggest string i could think off, i would have to do some  */
+  /* sort of recursion to get the dynamic size, which isnt worth it if you know */
+  /* roughly how big its going to be */
+  for(int i = 0; i < 100; i++) {
+    if(artist_info[i] == '\"' && artist_info[i+1] == ',')
+      break;
+
     distance++;
-    artist_info++;
   }
 
   return distance;

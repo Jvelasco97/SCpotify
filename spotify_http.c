@@ -4,7 +4,7 @@
 #include "token.h"
 
 /**
- * since i am going a GET req that requires me to 
+ * since i am doing a GET req that requires me to 
  * parse the data at somepoint, i use this function for
  * the display functionality and search song.
  * @param search_parameter - the song we want, can be null.
