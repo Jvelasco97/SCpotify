@@ -34,6 +34,7 @@ struct song_info_node {
 /* holds all the info for the node whhich displays what info we have available */
 struct available_song_node {
   char *album_api_info;
+  char *album_name;
   char *artist_info;
   char *album_position;
   char *song_title;

@@ -8,7 +8,7 @@ song_info_node *head = NULL;
 static struct 
 available_song_node *available_node = NULL;
 
-/**
+ /*
  * insert the node, its a linked list, but if you dont know,
  * when we create a new node, we want the head pointer to point to it
  * so have the previous head point to head, then we have head point to the new one
@@ -45,16 +45,8 @@ insert_node(char* song_info, ssize_t size)
  * @param song_info - song title for display purposes
  */
 void 
-insert_search_node(char *album_info, char *artist_info, char *track_position, char *song_title) 
+insert_search_node(struct available_song_node *node) 
 {
-  struct available_song_node *node = 
-  (struct available_song_node*) malloc(sizeof(struct available_song_node));
-
-  node->album_api_info = album_info;
-  node->artist_info = artist_info;
-  node->album_position = track_position;
-  node->song_title = song_title;
-
   /* point to previous head */
   node->next = available_node;
 
@@ -100,9 +92,10 @@ print_avaible_songs()
 
   /* display available songs */
   while(ptr != NULL) {
-    printf("%s[%d]%s %s%s%s by %s%s%s\n",
+    printf("%s[%d]%s %s%s%s (%s%s%s) by %s%s%s\n",
 	   "\x1B[36m",counter++,"\x1B[0m",
 	   "\x1B[31m",ptr->song_title,"\x1B[0m",
+	   "\x1B[34m",ptr->album_name,"\x1B[0m",
 	   "\x1B[33m",ptr->artist_info,"\x1B[0m");
     ptr = ptr->next;
   }

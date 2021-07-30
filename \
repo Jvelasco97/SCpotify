@@ -109,14 +109,13 @@ parse_search_info(char *json_web_data)
 char *insert_parsed_data(char **json_position, const char **search, int displacement) {
   *json_position = strstr(*json_position, *search);
   /* *json_position = json_position[strlen(*search) - 1]; */
-  /* *json_position = (json_position[strlen(*search)]); */
-  char *ptr = &*json_position[strlen(*search)];
-  /* *json_position = json_position[strlen(*search) - 1]; */
+  *json_position = *&(json_position[strlen(*search)]);
+  /* **json_position = *(json_position[strlen(*search) - 1]); */
 
 
   /* ssize_t distance = cut(*json_position); */
   /* *json_position[distance] = 0; */
-  printf("%s\n", ptr);
+  printf("%s\n", *json_position);
 
   /* char *ptr = malloc(sizeof(char) * distance); */
   /* memcpy(ptr, *&json_position + displacement, distance); */
