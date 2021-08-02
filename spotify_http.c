@@ -158,7 +158,7 @@ play_song(char *album_info, char* album_position) {
 
   char *jsonObj;
 
-  char *json_obj_start = "{\"context_uri\":\"";
+  char *json_obj_start = "{\"context_uri\":\"spotify:album:";
   char *json_obj_mid = "\",\"offset\":{\"position\":";
   char *json_obj_end = "},\"position_ms\":0}";
 

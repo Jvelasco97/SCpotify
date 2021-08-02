@@ -83,10 +83,10 @@ int main(int argc, char **argv) {
     /* perform curl with endpoint @ search */
     json_res = get_json_from_server(opt);
     parse_search_info(json_res);
-    /* struct search_song_request req = print_avaible_songs(); */
+    struct search_song_request req = print_avaible_songs();
     /* print_avaible_songs(); */
-    /* play_song(req.track_info, req.track_position); */
-    /* clear_search_list(); */
+    play_song(req.track_info, req.track_position);
+    clear_search_list();
     /* free the json response from get_json_from_server */
     free(json_res);
   } else if (cmd_args.modify_player) {
