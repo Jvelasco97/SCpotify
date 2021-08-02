@@ -35,6 +35,7 @@ Will search and prompt
 ![sample 3](samples/2021-07-26_17-34.png)
 
 ### TODO
+[ ] fix parsing
 [ ] add error checking  
 [X] add colors
 
