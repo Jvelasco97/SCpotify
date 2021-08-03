@@ -114,7 +114,8 @@ char *insert_parsed_data(char **json_position, const char **search, int displace
   /* the string later */
   ssize_t distance = cut(*json_position);
 
-  char *ptr = malloc(sizeof(char) * (distance));
+  /* plus one for the null */
+  char *ptr = malloc(sizeof(char) * (distance) + 1);
   memcpy(ptr, *json_position, distance);
 
   /* terminate the string as there is no previous terminator */

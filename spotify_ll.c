@@ -110,7 +110,7 @@ print_avaible_songs()
 
   do{
     scanf("%d", &choice);
-    if(!(choice > 0 && choice < 5 )) {
+    if(!(choice > -1 && choice < 5 )) {
       printf("\nplease enter the a valid range: ");
     }
   } while(choice < 0 || choice > 4);
