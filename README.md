@@ -35,8 +35,8 @@ Will search and prompt
 ![sample 3](samples/2021-07-26_17-34.png)
 
 ### TODO
-[X] fix parsing
-[ ] get rid of WHILE loops in parser.c, they can cause seg faults 
+[X] fix parsing  
+[ ] get rid of WHILE loops in parser.c, they can cause seg faults  
 [ ] add error checking  
 [X] add colors
 
