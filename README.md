@@ -17,6 +17,9 @@ I wrote a small script with `cronie` as the daemon for the cronjob.
 you need to follow the guide [here](https://developer.spotify.com/documentation/general/guides/authorization-guide/) to setup your refresh token.
 
 #### sample commands
+`spotifyC --show`  
+Will display currently playing song  
+
 `spotifyC -n`  
 Will play the next song  
 
@@ -31,6 +34,10 @@ Will reseume the song
   
 `spotifyC -s "example song"`  
 Will search and prompt  
+
+`spotifyC -t`  
+Will display past 10 songs  
+
 
 ![sample 3](samples/2021-07-26_17-34.png)
 
