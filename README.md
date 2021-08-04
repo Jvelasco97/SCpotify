@@ -36,27 +36,27 @@ Will search and prompt
 
 ## TODO
 
-###General
+### General
 - [ ] add error checking  
 - [X] add colors
 
-###Player
+### Player
 - [ ] shuffle functionality
 - [ ] repeat functionality
 - [ ] seek functionality (in ms for now)
 - [ ] volume functionality
 - [ ] previously played functionality
 
-###Personalization
+### Personalization
 - [ ] display top artists and songs
 
-###Artists
+### Artists
 - [ ] display related artists 
 
-###Browse  
+### Browse  
 - [ ] recommendations
 
-###Albums
+### Albums
 - [ ] search album and play song
 
 ### Optional  
