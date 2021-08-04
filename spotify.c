@@ -16,7 +16,10 @@
  * @param put_post - since the player api has a POST or PUT, i use a
  * boolean value to determine which one is being used
  */
-char *process_args(int argc, char **argv, struct args_type *args,
+char *process_args(int argc, 
+		   char **argv, 
+		   struct args_type *args,
+		   struct get_url *url_args,
                    bool *put_post) 
 {
   int choice;
@@ -24,14 +27,16 @@ char *process_args(int argc, char **argv, struct args_type *args,
 
   static struct option long_options[] = 
   {
+      {"show",     no_argument, 	NULL,  0 },
       {"repeat",     required_argument, NULL,  0 },
       {"shuffle",    required_argument, NULL,  0 },
       {"seek",       required_argument, NULL,  0 },
       {"vol",        required_argument, NULL,  0 },
+      {"recent",     no_argument,       NULL,  0 },
       {NULL,         0,                 NULL,  0 }
   };
 
-  while ((choice = getopt_long(argc, argv, "prnbs:", long_options, &option_index)) != EOF) 
+  while ((choice = getopt_long(argc, argv, "prnbs:t", long_options, &option_index)) != EOF) 
   {
     switch (choice) 
     {
@@ -103,6 +108,14 @@ char *process_args(int argc, char **argv, struct args_type *args,
 
 	return endpoint;
       }
+      else if(strcmp("show", long_options[option_index].name) == 0)
+      {
+	args->modify_player   = false;
+	args->display_song    = true;
+	url_args->display_url = true;
+	return NULL;
+	break;
+      }
       break;
     /* pause player  -- PUT*/
     case 'p':
@@ -136,12 +149,21 @@ char *process_args(int argc, char **argv, struct args_type *args,
     case 's':
       printf("\nSearching...\n\n");
       args->modify_change_song = true;
+      url_args->search_url = true;
       return optarg;
+      break;
+    case 't':
+      printf("\nfetching past songs...\n\n");
+      args->show_recently_played = true;
+      url_args->recent_url = true;
+      return "recently-played?limit=9" ;
       break;
     /* unknown opt, just default to display */
     default:
       args->display_song = true;
+      url_args->display_url = true;
       return NULL;
+      break;
     }
   }
 
@@ -156,32 +178,52 @@ int main(int argc, char **argv)
   extern char *optarg;
 
   struct args_type cmd_args;
+  cmd_args.modify_player = false;
+  cmd_args.modify_change_song = false;
+  cmd_args.display_song = false;
+  cmd_args.show_recently_played = false;
+  
+  struct get_url url_args;
+  url_args.display_url = false;
+  url_args.recent_url  = false;
+  url_args.search_url  = false;
+
   bool req_type = false;
 
   /* opt returns the endpoint */
-  char *opt = process_args(argc, argv, &cmd_args, &req_type);
+  char *opt = process_args(argc, argv, &cmd_args, &url_args, &req_type);
   /* hold the json response */
   char *json_res;
 
   if (cmd_args.modify_change_song) 
   {
     /* perform curl with endpoint @ search */
-    json_res = get_json_from_server(opt);
+    json_res = get_json_from_server(opt, url_args);
     parse_search_info(json_res);
     struct search_song_request req = print_avaible_songs();
-    /* print_avaible_songs(); */
     play_song(req.track_info, req.track_position);
     clear_search_list();
     /* free the json response from get_json_from_server */
     free(json_res);
-  } else if (cmd_args.modify_player) 
-    {
+  } 
+  else if(cmd_args.show_recently_played) 
+  {
+    json_res = get_json_from_server(opt, url_args);
+    parse_search_info(json_res);
+    struct search_song_request req = print_avaible_songs();
+    play_song(req.track_info, req.track_position);
+    clear_search_list();
+    free(json_res);
+  } 
+  else if(cmd_args.modify_player) 
+  {
     /* perform curl with enndpoint to modify player */
     change_player_status(opt, req_type);
-    } 
-  else {
+  } 
+  else if(cmd_args.display_song)
+  {
     /* perform curl with endpoint @ currently-playing */
-    json_res = get_json_from_server(opt);
+    json_res = get_json_from_server(opt, url_args);
     parse_currently_playing(json_res);
     printList();
     clear_linked_list();

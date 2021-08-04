@@ -9,7 +9,7 @@
  * the display functionality and search song.
  * @param search_parameter - the song we want, can be null.
  */
-char *get_json_from_server(char *search_parameter) {
+char *get_json_from_server(char *search_parameter, struct get_url url) {
   CURL *curl;
   CURLcode res;
   struct curl_slist *headers = NULL;
@@ -27,13 +27,14 @@ char *get_json_from_server(char *search_parameter) {
   web_data.allocated_max_size = 16;
 
   char *SPOTIFY_SEARCH_URL = "https://api.spotify.com/v1/search?q=";
+  char *SPOTIFY_RECENTLY_URL = "https://api.spotify.com/v1/me/player/";
   char *SPOTIFY_CURRENTLY_PLAYING =
       "https://api.spotify.com/v1/me/player/currently-playing";
   char *endpoint;
 
   /* if we received a search query, then we prep the url */
   /* else we just specify currenly playing */
-  if (search_parameter) {
+  if (url.search_url) {
     char *encoded_string = url_encoder(search_parameter);
 
     if ((endpoint = malloc(strlen(SPOTIFY_SEARCH_URL) + strlen(encoded_string) + 1)) != NULL) {
@@ -42,10 +43,28 @@ char *get_json_from_server(char *search_parameter) {
       strcat(endpoint, SPOTIFY_SEARCH_URL);
 
       strcat(endpoint, encoded_string);
-    } else {
+    } 
+    else 
+    {
       printf("malloc failed!\n");
     }
-  } else {
+  } 
+  else if(url.recent_url)
+  {
+    if ((endpoint = malloc(strlen(SPOTIFY_RECENTLY_URL) + strlen(search_parameter) + 1)) != NULL) {
+      endpoint[0] = '\0';
+
+      strcat(endpoint, SPOTIFY_RECENTLY_URL);
+
+      strcat(endpoint, search_parameter);
+    } 
+    else 
+    {
+      printf("malloc failed!\n");
+    }
+  }
+  else 
+  {
     endpoint = SPOTIFY_CURRENTLY_PLAYING;
   }
 

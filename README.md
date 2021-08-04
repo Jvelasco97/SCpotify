@@ -38,6 +38,7 @@ Will search and prompt
 
 ### General
 - [ ] add error checking  
+- [ ] reduce redundant code
 - [X] add colors
 
 ### Player
@@ -45,7 +46,7 @@ Will search and prompt
 - [X] repeat functionality
 - [X] seek functionality (in ms for now)
 - [X] volume functionality
-- [ ] previously played functionality
+- [X] previously played functionality
 - [ ] add song to current player
 
 ### Personalization
@@ -61,5 +62,5 @@ Will search and prompt
 - [ ] search album and play song
 
 ### Optional  
-[ ] use make for some of the automation
-[ ] have the program handle OAUTH
+- [ ] use make for some of the automation
+- [ ] have the program handle OAUTH

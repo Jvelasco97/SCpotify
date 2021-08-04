@@ -28,10 +28,10 @@ parse_currently_playing(char *json_web_data)
     ssize_t distance = cut(json_position);
 
     /* temporarely terminate the string so it can be copied in the node */
-    json_position[distance - 1] = 0;
+    json_position[distance] = 0;
 
     /* add offset of 5 characters */
-    char *ptr = json_position + 5;
+    char *ptr = json_position + 6;
 
     /* strstr gets an unwanted field, cannot be ignored because the */
     /* json response */
@@ -39,7 +39,7 @@ parse_currently_playing(char *json_web_data)
       insert_node(ptr, distance);
 
     /* reset the json string */
-    json_position[distance - 1] = ' ';
+    json_position[distance] = ' ';
 
     /* the flag is enabled for the remainder of the loop */
     skipped_extra = 1;
