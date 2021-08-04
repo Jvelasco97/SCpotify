@@ -34,11 +34,31 @@ Will search and prompt
 
 ![sample 3](samples/2021-07-26_17-34.png)
 
-### TODO
-[X] fix parsing  
-[ ] get rid of WHILE loops in parser.c, they can cause seg faults  
-[ ] add error checking  
-[X] add colors
+## TODO
+
+###General
+- [ ] add error checking  
+- [X] add colors
+
+###Player
+- [ ] shuffle functionality
+- [ ] repeat functionality
+- [ ] seek functionality (in ms for now)
+- [ ] volume functionality
+- [ ] previously played functionality
+
+###Personalization
+- [ ] display top artists and songs
+
+###Artists
+- [ ] display related artists 
+
+###Browse  
+- [ ] recommendations
+
+###Albums
+- [ ] search album and play song
 
 ### Optional  
 [ ] use make for some of the automation
+[ ] have the program handle OAUTH
