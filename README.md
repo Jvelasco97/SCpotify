@@ -41,11 +41,12 @@ Will search and prompt
 - [X] add colors
 
 ### Player
-- [ ] shuffle functionality
-- [ ] repeat functionality
-- [ ] seek functionality (in ms for now)
-- [ ] volume functionality
+- [X] shuffle functionality
+- [X] repeat functionality
+- [X] seek functionality (in ms for now)
+- [X] volume functionality
 - [ ] previously played functionality
+- [ ] add song to current player
 
 ### Personalization
 - [ ] display top artists and songs

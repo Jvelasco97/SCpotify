@@ -5,6 +5,7 @@
  * @brief gets current playing song on spotify, more stuff soon, prob....
  */
 #include "main_includes.h"
+#include <getopt.h> /* getopt */
 
 /**
  * process the arguements passed so that the proper
@@ -16,11 +17,93 @@
  * boolean value to determine which one is being used
  */
 char *process_args(int argc, char **argv, struct args_type *args,
-                   bool *put_post) {
+                   bool *put_post) 
+{
   int choice;
+  int option_index = 0;
 
-  while ((choice = getopt(argc, argv, "prnbs:")) != EOF) {
-    switch (choice) {
+  static struct option long_options[] = 
+  {
+      {"repeat",     required_argument, NULL,  0 },
+      {"shuffle",    required_argument, NULL,  0 },
+      {"seek",       required_argument, NULL,  0 },
+      {"vol",        required_argument, NULL,  0 },
+      {NULL,         0,                 NULL,  0 }
+  };
+
+  while ((choice = getopt_long(argc, argv, "prnbs:", long_options, &option_index)) != EOF) 
+  {
+    switch (choice) 
+    {
+    case 0:
+      args->modify_player = true;
+      /* printf("long option %s", long_options[option_index].name); */
+      if(strcmp("repeat", long_options[option_index].name) == 0) 
+      {
+	*put_post = true;
+
+	if(strcmp("track", optarg) == 0)
+	{
+	  return "repeat?state=track";
+	}
+	else if(strcmp("context", optarg) == 0)
+	{
+	  return "repeat?state=context";
+	}
+	else if(strcmp("off", optarg) == 0)
+	{
+	  return "repeat?state=off";
+	}
+      } 
+      else if(strcmp("shuffle", long_options[option_index].name) == 0)
+      {
+	*put_post = true;
+	if(strcmp("t", optarg) == 0)
+	{
+	  return "shuffle?state=true";
+	}
+	else if(strcmp("f", optarg) == 0)
+	{
+	  return "shuffle?state=false";
+	}
+      }
+      else if(strcmp("seek", long_options[option_index].name) == 0)
+      {
+	*put_post = true;
+	char * endpoint;
+	const char * url = "seek?position_ms=";
+
+	if ((endpoint = malloc(strlen(url) + strlen(optarg) + 1)) != NULL) {
+	  endpoint[0] = '\0';
+
+	  strcat(endpoint, url);
+
+	  strcat(endpoint, optarg);
+	} else {
+	  printf("malloc failed!\n");
+	}
+
+	return endpoint;
+      }
+      else if(strcmp("vol", long_options[option_index].name) == 0)
+      {
+	*put_post = true;
+	char * endpoint;
+	const char * url = "volume?volume_percent=";
+
+	if ((endpoint = malloc(strlen(url) + strlen(optarg) + 1)) != NULL) {
+	  endpoint[0] = '\0';
+
+	  strcat(endpoint, url);
+
+	  strcat(endpoint, optarg);
+	} else {
+	  printf("malloc failed!\n");
+	}
+
+	return endpoint;
+      }
+      break;
     /* pause player  -- PUT*/
     case 'p':
       printf("\nNow pausing\n");
@@ -65,7 +148,8 @@ char *process_args(int argc, char **argv, struct args_type *args,
   return NULL;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv) 
+{
 
   /* from get opt */
   extern int optind;
@@ -79,7 +163,8 @@ int main(int argc, char **argv) {
   /* hold the json response */
   char *json_res;
 
-  if (cmd_args.modify_change_song) {
+  if (cmd_args.modify_change_song) 
+  {
     /* perform curl with endpoint @ search */
     json_res = get_json_from_server(opt);
     parse_search_info(json_res);
@@ -89,10 +174,12 @@ int main(int argc, char **argv) {
     clear_search_list();
     /* free the json response from get_json_from_server */
     free(json_res);
-  } else if (cmd_args.modify_player) {
+  } else if (cmd_args.modify_player) 
+    {
     /* perform curl with enndpoint to modify player */
     change_player_status(opt, req_type);
-  } else {
+    } 
+  else {
     /* perform curl with endpoint @ currently-playing */
     json_res = get_json_from_server(opt);
     parse_currently_playing(json_res);
