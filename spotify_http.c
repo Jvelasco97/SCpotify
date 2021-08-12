@@ -49,9 +49,49 @@ size_t StoreData(char *contents, size_t size, size_t nmemb, void *user_struct) {
   return realsize;
 }
 
+void spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, struct curl_slist *headers)
+{
+  struct json_data web_data;
+  web_data.data = malloc(sizeof(char) * 16);
+  web_data.current_size = 0;
+  web_data.allocated_max_size = 16;
+
+  switch(args->http_type)
+  {
+    case GET:
+      curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, StoreData);
+      curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, &web_data);
+
+      res = curl_easy_perform(curl);
+
+      args->search_struct->spotify_json_res = web_data.data;
+      break;
+    case POST:
+      curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+      curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
+      res = curl_easy_perform(curl);
+      break;
+    case PUT:
+      curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, args->search_struct->jsonObj);
+      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+      curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
+      res = curl_easy_perform(curl);
+      break;
+    case DELETE:
+      break;
+
+    default:
+      break;
+  }
+}
+
 void spotify_http(struct spotify_args *args) {
   CURL *curl;
-  CURLcode res;
+  CURLcode res = 0;
   struct curl_slist *headers = NULL;
 
   headers = curl_slist_append(headers, "Accept: application/json");
@@ -64,43 +104,7 @@ void spotify_http(struct spotify_args *args) {
   if (curl) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     
-    struct json_data web_data;
-    web_data.data = malloc(sizeof(char) * 16);
-    web_data.current_size = 0;
-    web_data.allocated_max_size = 16;
-
-    switch(args->http_type)
-    {
-      case GET:
-	curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
-	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, StoreData);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &web_data);
-
-	res = curl_easy_perform(curl);
-
-	args->search_struct->spotify_json_res = web_data.data;
-	break;
-      case POST:
-	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
-	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-	curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
-        res = curl_easy_perform(curl);
-	break;
-      case PUT:
-	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, args->search_struct->jsonObj);
-	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-	curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
-        res = curl_easy_perform(curl);
-	break;
-      case DELETE:
-	break;
-
-      default:
-	break;
-    }
-
+    spotify_http_perform(curl, args, res, headers);
 
     if (CURLE_OK == res) {
       char *ct;
@@ -109,37 +113,6 @@ void spotify_http(struct spotify_args *args) {
   }
 
   curl_slist_free_all(headers);
-}
-
-char *build_json_req(char *album_info, char* album_position){
-  /* we the offset needs to be set to the number minus 1 */
-  int pos = atoi(album_position);
-  pos--;
- 
-  /* turn the int to a char again */
-  char offset[2];
-  sprintf(offset, "%d", pos);
-
-  char *jsonObj;
-
-  char *json_obj_start = "{\"context_uri\":\"spotify:album:";
-  char *json_obj_mid = "\",\"offset\":{\"position\":";
-  char *json_obj_end = "},\"position_ms\":0}";
-
-  /* malloc sufficient space for the data so we can append all the values */
-  if ((jsonObj = malloc(strlen(json_obj_start) + strlen(album_info) + strlen(json_obj_mid) + 1 + strlen(json_obj_end) + 1)) != NULL) {
-    jsonObj[0] = '\0';
-
-    strcat(jsonObj, json_obj_start);
-    strcat(jsonObj, album_info);
-    strcat(jsonObj, json_obj_mid);
-    strcat(jsonObj, offset);
-    strcat(jsonObj, json_obj_end);
-  } else {
-    printf("malloc failed!\n");
-  }
-
-  return jsonObj;
 }
 
 char *build_search_query(struct spotify_args *args)

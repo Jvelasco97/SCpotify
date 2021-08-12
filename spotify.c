@@ -15,24 +15,63 @@
 #define SPOTIFY_HISTORY           6
 #define SPOTIFY_QUEUE             7
 
+#define  GET    0
+#define  POST   1
+#define  PUT    2
+#define  DELETE 3
 
-int main(int argc, char **argv) {
+void spotify_play_song(struct spotify_args *cmd_args, struct search_song_request req)
+{
+  /* build endpoint for search & parse needed info*/
+  cmd_args->endpoint = build_search_query(cmd_args);
+  spotify_http(cmd_args);
+  parse_search_info(cmd_args->search_struct->spotify_json_res);
+  req = print_avaible_songs();
 
-  /* from get opt */
-  extern int optind;
-  extern char *optarg;
+  /* once we have the neccesary info, we change the endpoint and request */
+  cmd_args->http_type = PUT;
+  cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play";
+  cmd_args->search_struct->jsonObj = build_put_request(req.track_info, req.track_position);
+  spotify_http(cmd_args);
+  clear_search_list();
+}
 
-  struct spotify_args *cmd_args = (struct spotify_args*) malloc(sizeof(struct spotify_args));
-  struct spotify_search *search = (struct spotify_search*) malloc(sizeof(struct spotify_search));
+void spotify_play_recents(struct spotify_args *cmd_args, struct search_song_request req)
+{
+  /* fetch previous songs and parse */
+  spotify_http(cmd_args);
+  parse_search_info(cmd_args->search_struct->spotify_json_res);
+  req = print_avaible_songs();
 
-  struct search_song_request req;
+  /* once we have the neccesary info, we change the endpoint and request */
+  cmd_args->http_type = PUT;
+  cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play";
+  cmd_args->search_struct->jsonObj = build_put_request(req.track_info, req.track_position);
+  spotify_http(cmd_args);
+  clear_search_list();
+}
 
-  cmd_args->search_struct = search;
+void spotify_add_song_queue(struct spotify_args *cmd_args, struct search_song_request req)
+{
+  /* fetch songs and parse */
+  cmd_args->endpoint = build_search_query(cmd_args);
+  spotify_http(cmd_args);
+  parse_queue_search_info(cmd_args->search_struct->spotify_json_res);
+  req = print_avaible_songs();
+  free(cmd_args->endpoint);
 
-  /* opt returns the endpoint */
-  /* cmd_args->search_struct = search_args; */
-  process_args(argc, argv, cmd_args);
-  /* hold the json response */
+  /* once we have the neccesary info, we change the endpoint and request */
+  cmd_args->search_struct->is_query = false;
+  cmd_args->search_struct->search_query = req.track_info;
+  cmd_args->http_type = POST;
+  cmd_args->endpoint = "https://api.spotify.com/v1/me/player/queue?uri=spotify:track:";
+  cmd_args->endpoint = build_search_query(cmd_args);
+  spotify_http(cmd_args);
+  clear_search_list();
+}
+
+void spotifyC(struct spotify_args *cmd_args, struct search_song_request req)
+{
   switch(cmd_args->spotify_command)
   {
     case SPOTIFY_CURRENTLY_PLAYING:
@@ -51,43 +90,40 @@ int main(int argc, char **argv) {
       spotify_http(cmd_args);
       break;
     case SPOTIFY_SEARCH:
-      cmd_args->endpoint = build_search_query(cmd_args);
-      spotify_http(cmd_args);
-      parse_search_info(cmd_args->search_struct->spotify_json_res);
-      req = print_avaible_songs();
-      cmd_args->http_type = 2;
-      cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play";
-      cmd_args->search_struct->jsonObj = build_put_request(req.track_info, req.track_position);
-      spotify_http(cmd_args);
-      clear_search_list();
+      spotify_play_song(cmd_args, req);
       break;
     case SPOTIFY_HISTORY:
-      spotify_http(cmd_args);
-      parse_search_info(cmd_args->search_struct->spotify_json_res);
-      req = print_avaible_songs();
-      cmd_args->http_type = 2;
-      cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play";
-      cmd_args->search_struct->jsonObj = build_put_request(req.track_info, req.track_position);
-      spotify_http(cmd_args);
-      clear_search_list();
+      spotify_play_recents(cmd_args, req);
       break;
     case SPOTIFY_QUEUE:
-      cmd_args->endpoint = build_search_query(cmd_args);
-      spotify_http(cmd_args);
-      parse_queue_search_info(cmd_args->search_struct->spotify_json_res);
-      req = print_avaible_songs();
-      free(cmd_args->endpoint);
-      cmd_args->search_struct->is_query = false;
-      cmd_args->search_struct->search_query = req.track_info;
-      cmd_args->http_type = 1;
-      cmd_args->endpoint = "https://api.spotify.com/v1/me/player/queue?uri=spotify:track:";
-      cmd_args->endpoint = build_search_query(cmd_args);
-      spotify_http(cmd_args);
-      /* clear_search_list(); */
+      spotify_add_song_queue(cmd_args, req);
       break;
     default:
       break;
   }
+}
+
+int main(int argc, char **argv) {
+
+  /* from get opt */
+  extern int optind;
+  extern char *optarg;
+
+  /* instantiate the struct for the command line and search queries */
+  struct spotify_args *cmd_args = (struct spotify_args*) malloc(sizeof(struct spotify_args));
+  struct spotify_search *search = (struct spotify_search*) malloc(sizeof(struct spotify_search));
+
+  /* hold the parsed song info that will be used to play song later */
+  struct search_song_request req;
+
+  /* link our command struct to the search */
+  cmd_args->search_struct = search;
+
+  /* process the command line options */
+  process_args(argc, argv, cmd_args);
+
+  /* call http and parse */
+  spotifyC(cmd_args, req);
 
   return 0;
 }
