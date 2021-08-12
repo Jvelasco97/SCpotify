@@ -49,6 +49,13 @@ size_t StoreData(char *contents, size_t size, size_t nmemb, void *user_struct) {
   return realsize;
 }
 
+void curl_setopt(CURL *curl, struct spotify_args *args, struct curl_slist *headers, char *req_type)
+{
+  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, req_type);
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+  curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
+}
+
 void spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, struct curl_slist *headers)
 {
   struct json_data web_data;
@@ -59,9 +66,8 @@ void spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, s
   switch(args->http_type)
   {
     case GET:
-      curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+      curl_setopt(curl, args, headers, "GET");
       curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, StoreData);
-      curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
       curl_easy_setopt(curl, CURLOPT_WRITEDATA, &web_data);
 
       res = curl_easy_perform(curl);
@@ -69,16 +75,12 @@ void spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, s
       args->search_struct->spotify_json_res = web_data.data;
       break;
     case POST:
-      curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
-      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-      curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
+      curl_setopt(curl, args, headers, "POST");
       res = curl_easy_perform(curl);
       break;
     case PUT:
-      curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+      curl_setopt(curl, args, headers, "PUT");
       curl_easy_setopt(curl, CURLOPT_POSTFIELDS, args->search_struct->jsonObj);
-      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-      curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
       res = curl_easy_perform(curl);
       break;
     case DELETE:

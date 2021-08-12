@@ -77,7 +77,7 @@ void printList() {
  */
 
 struct search_song_request 
-print_avaible_songs() 
+print_avaible_songs(u_int8_t MAX_SEARCH) 
 {
   struct available_song_node *ptr = available_node;
 
@@ -108,12 +108,14 @@ print_avaible_songs()
   int choice;
   printf("\nPlay which song? ");
 
-  do{
+  while(true)
+  {
     scanf("%d", &choice);
-    if(!(choice > -1 && choice < 5 )) {
+    if(!(choice > -1 && choice < MAX_SEARCH )) {
       printf("\nplease enter the a valid range: ");
-    }
-  } while(choice < 0 || choice > 4);
+    } else
+      break;
+  }
 
   while(ptr != NULL) {
     if(counter == choice) {

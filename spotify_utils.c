@@ -1,18 +1,11 @@
 #include "spotify_utils.h"
 
-/**
- * adds the appropaite characters to the url
- * @param search - the url we want to encode
- * @return the encoded url
- */
-char* 
-url_encoder(char* search, bool query) 
+u_int8_t get_url_size(char *search)
 {
-
-  int url_size = 0;
+  u_int8_t url_size = 0;
 
   /* create str size based on special chars found */
-  for(int i = 0; i < strlen(search); i++) {
+  for(u_int8_t i = 0; i < strlen(search); i++) {
     if(*(search + i) == ' '|| *(search + i) == ':' || *(search + i) == '\'') {
       url_size+=3;
     } else {
@@ -20,8 +13,24 @@ url_encoder(char* search, bool query)
     }
   }
 
-  /* the new encoded url */
-  char new_str[url_size];
+  return url_size;
+}
+
+/* replace the spaces with the encoded ones */
+/* i used two pointers to keep track of the positions in  */
+/* both arrays */
+
+/* have both arrays start at 0, if we hit a space, we */
+/* append the special chars and we increment the pointer of the */
+/* new_str by 3 because thats the length of the special char arr */
+
+/* add a space so we can append the rest */
+/* we can change the number of results here */
+
+void build_url(char *new_str, char* search, u_int8_t url_size)
+{
+  ssize_t i = 0;
+  ssize_t j = i;
 
   /* url spaces */
   const char space[3] = {'%','2','0'};
@@ -32,18 +41,6 @@ url_encoder(char* search, bool query)
   /* url colons */
   const char colon[3] = {'%','3','A'};
 
-
-  ssize_t i = 0;
-  ssize_t j = i;
-
-
-  /* replace the spaces with the encoded ones */
-  /* i used two pointers to keep track of the positions in  */
-  /* both arrays */
-
-  /* have both arrays start at 0, if we hit a space, we */
-  /* append the special chars and we increment the pointer of the */
-  /* new_str by 3 because thats the length of the special char arr */
   while(i < url_size) {
     *(new_str + j) = *(search + i);
 
@@ -71,16 +68,13 @@ url_encoder(char* search, bool query)
     }
 	i++;
   }
+}
 
 
-  /* &type=track */
-  /* add a space so we can append the rest */
-  /* we can change the number of results here */
-  if(query) {
-    strcat(new_str, "&type=track&limit=5");
-  }
-
+char *perform_memcopy(char *new_str)
+{
   char *encoded_url;
+
   if ((encoded_url = malloc(strlen(new_str) + 1)) != NULL) {
     encoded_url[0] = '\0';
 
@@ -90,6 +84,31 @@ url_encoder(char* search, bool query)
   {
     printf("malloc failed!\n");
   }
+
+  return encoded_url;
+}
+
+/**
+ * adds the appropaite characters to the url
+ * @param search - the url we want to encode
+ * @return the encoded url
+ */
+char* 
+url_encoder(char* search, bool query) 
+{
+
+  u_int8_t url_size = get_url_size(search);
+
+  /* the new encoded url */
+  char new_str[url_size];
+
+  build_url(new_str, search, url_size);
+
+  if(query) {
+    strcat(new_str, "&type=track&limit=5");
+  }
+
+  char *encoded_url = perform_memcopy(new_str);
 
   return encoded_url;
 }

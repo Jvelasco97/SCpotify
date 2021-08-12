@@ -36,8 +36,10 @@ Will reseume the song
 Will search and prompt  
 
 `spotifyC -t`  
-Will display past 10 songs  
+Will display past 20 songs  
 
+`spotifyC -q "example song"`  
+Will seach and prompt what song to add in queue  
 
 ![sample 3](samples/2021-07-26_17-34.png)
 
@@ -45,7 +47,7 @@ Will display past 10 songs
 
 ### General
 - [ ] add error checking  
-- [ ] reduce redundant code
+- [X] reduce redundant code
 - [X] add colors
 
 ### Player
@@ -61,10 +63,10 @@ Will display past 10 songs
 
 ### Artists
 - [ ] display related artists 
+- [ ] display artists and play song
 
 ### Albums
 - [ ] search album and play song
 
 ### Optional  
-- [ ] use make for some of the automation
 - [ ] have the program handle OAUTH

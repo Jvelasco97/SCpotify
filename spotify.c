@@ -20,13 +20,21 @@
 #define  PUT    2
 #define  DELETE 3
 
+void spotify_show_current_song(struct spotify_args *cmd_args)
+{
+  spotify_http(cmd_args);
+  parse_currently_playing(cmd_args->search_struct->spotify_json_res);
+  printList();
+  clear_search_list();
+}
+
 void spotify_play_song(struct spotify_args *cmd_args, struct search_song_request req)
 {
   /* build endpoint for search & parse needed info*/
   cmd_args->endpoint = build_search_query(cmd_args);
   spotify_http(cmd_args);
   parse_search_info(cmd_args->search_struct->spotify_json_res);
-  req = print_avaible_songs();
+  req = print_avaible_songs(5);
 
   /* once we have the neccesary info, we change the endpoint and request */
   cmd_args->http_type = PUT;
@@ -41,7 +49,7 @@ void spotify_play_recents(struct spotify_args *cmd_args, struct search_song_requ
   /* fetch previous songs and parse */
   spotify_http(cmd_args);
   parse_search_info(cmd_args->search_struct->spotify_json_res);
-  req = print_avaible_songs();
+  req = print_avaible_songs(20);
 
   /* once we have the neccesary info, we change the endpoint and request */
   cmd_args->http_type = PUT;
@@ -57,7 +65,7 @@ void spotify_add_song_queue(struct spotify_args *cmd_args, struct search_song_re
   cmd_args->endpoint = build_search_query(cmd_args);
   spotify_http(cmd_args);
   parse_queue_search_info(cmd_args->search_struct->spotify_json_res);
-  req = print_avaible_songs();
+  req = print_avaible_songs(5);
   free(cmd_args->endpoint);
 
   /* once we have the neccesary info, we change the endpoint and request */
@@ -67,6 +75,7 @@ void spotify_add_song_queue(struct spotify_args *cmd_args, struct search_song_re
   cmd_args->endpoint = "https://api.spotify.com/v1/me/player/queue?uri=spotify:track:";
   cmd_args->endpoint = build_search_query(cmd_args);
   spotify_http(cmd_args);
+  free(cmd_args->endpoint);
   clear_search_list();
 }
 
@@ -75,7 +84,7 @@ void spotifyC(struct spotify_args *cmd_args, struct search_song_request req)
   switch(cmd_args->spotify_command)
   {
     case SPOTIFY_CURRENTLY_PLAYING:
-      spotify_http(cmd_args);
+      spotify_show_current_song(cmd_args);
       break;
     case SPOTIFY_PLAY:
       spotify_http(cmd_args);
@@ -124,6 +133,9 @@ int main(int argc, char **argv) {
 
   /* call http and parse */
   spotifyC(cmd_args, req);
+
+  free(search);
+  free(cmd_args);
 
   return 0;
 }
