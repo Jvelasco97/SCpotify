@@ -54,16 +54,13 @@ Will display past 10 songs
 - [X] seek functionality (in ms for now)
 - [X] volume functionality
 - [X] previously played functionality
-- [ ] add song to current player
+- [X] add song to current player
 
 ### Personalization
 - [ ] display top artists and songs
 
 ### Artists
 - [ ] display related artists 
-
-### Browse  
-- [ ] recommendations
 
 ### Albums
 - [ ] search album and play song

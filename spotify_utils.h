@@ -3,6 +3,7 @@
 
 #include "includes.h"
 
-char* url_encoder();
+char* url_encoder(char *, bool);
+char* concat_strings(char *, char *);
 
 #endif

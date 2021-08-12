@@ -8,5 +8,7 @@ size_t StoreData(char *contents, size_t size, size_t nmemb, void *user_struct);
 char *get_json_from_server(char *, struct get_url);
 void change_player_status(char *, bool);
 void play_song(char *, char *);
-
+void spotify_http(struct spotify_args *);
+char *build_search_query(struct spotify_args *);
+char *build_put_request(char *album_info, char* album_position);
 #endif

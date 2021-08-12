@@ -3,219 +3,10 @@
 #include "spotify_utils.h"
 #include "token.h"
 
-/**
- * since i am doing a GET req that requires me to 
- * parse the data at somepoint, i use this function for
- * the display functionality and search song.
- * @param search_parameter - the song we want, can be null.
- */
-char *get_json_from_server(char *search_parameter, struct get_url url) {
-  CURL *curl;
-  CURLcode res;
-  struct curl_slist *headers = NULL;
-
-  headers = curl_slist_append(headers, "Accept: application/json");
-  headers = curl_slist_append(headers, "Content-Type: application/json");
-  headers = curl_slist_append(headers, "charset: utf-8");
-
-  headers = curl_slist_append(headers, token);
-  curl = curl_easy_init();
-
-  struct json_data web_data;
-  web_data.data = malloc(sizeof(char) * 16);
-  web_data.current_size = 0;
-  web_data.allocated_max_size = 16;
-
-  char *SPOTIFY_SEARCH_URL = "https://api.spotify.com/v1/search?q=";
-  char *SPOTIFY_RECENTLY_URL = "https://api.spotify.com/v1/me/player/";
-  char *SPOTIFY_CURRENTLY_PLAYING =
-      "https://api.spotify.com/v1/me/player/currently-playing";
-  char *endpoint;
-
-  /* if we received a search query, then we prep the url */
-  /* else we just specify currenly playing */
-  if (url.search_url) {
-    char *encoded_string = url_encoder(search_parameter);
-
-    if ((endpoint = malloc(strlen(SPOTIFY_SEARCH_URL) + strlen(encoded_string) + 1)) != NULL) {
-      endpoint[0] = '\0';
-
-      strcat(endpoint, SPOTIFY_SEARCH_URL);
-
-      strcat(endpoint, encoded_string);
-    } 
-    else 
-    {
-      printf("malloc failed!\n");
-    }
-  } 
-  else if(url.recent_url)
-  {
-    if ((endpoint = malloc(strlen(SPOTIFY_RECENTLY_URL) + strlen(search_parameter) + 1)) != NULL) {
-      endpoint[0] = '\0';
-
-      strcat(endpoint, SPOTIFY_RECENTLY_URL);
-
-      strcat(endpoint, search_parameter);
-    } 
-    else 
-    {
-      printf("malloc failed!\n");
-    }
-  }
-  else 
-  {
-    endpoint = SPOTIFY_CURRENTLY_PLAYING;
-  }
-
-  if (curl) {
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curl, CURLOPT_URL, endpoint);
-    /* curl_easy_setopt(curl, CURLOPT_HTTPGET,1);  */
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-
-    /* callback that handles the writing  of the data */
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, StoreData);
-
-    /* Set the data to pass when the function is called */
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &web_data);
-    res = curl_easy_perform(curl);
-
-    if (CURLE_OK == res) {
-      char *ct;
-      res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct);
-    }
-  }
-
-  if (search_parameter)
-    free(endpoint);
-
-  curl_slist_free_all(headers);
-
-  return web_data.data;
-}
-
-/**
- * modifies the state of the player. 
- * @param opt - the endpoint that will be hit
- * @param req_type - wether we use PUT or POST
- */
-void change_player_status(char *opt, bool req_type) {
-  CURL *curl;
-  CURLcode res;
-  struct curl_slist *headers = NULL;
-
-  char *SPOTIFY_PLAYER_URL = "https://api.spotify.com/v1/me/player/";
-
-  char *endpoint;
-
-  /* make sure we have enough to malloc the string */
-  if ((endpoint = malloc(strlen(SPOTIFY_PLAYER_URL) + strlen(opt) + 1)) != NULL) {
-    endpoint[0] = '\0';
-
-    strcat(endpoint, SPOTIFY_PLAYER_URL);
-
-    strcat(endpoint, opt);
-  } else {
-    printf("malloc failed!\n");
-  }
-
-  headers = curl_slist_append(headers, "Accept: application/json");
-  headers = curl_slist_append(headers, "Content-Type: application/json");
-  headers = curl_slist_append(headers, "charset: utf-8");
-
-  /* curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonObj); */
-  headers = curl_slist_append(headers, token);
-  curl = curl_easy_init();
-
-  char *req = "PUT";
-
-  if (!req_type) {
-    req = "POST";
-  }
-
-  if (curl) {
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, req);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curl, CURLOPT_URL, endpoint);
-
-    res = curl_easy_perform(curl);
-
-    if (CURLE_OK == res) {
-      char *ct;
-      res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct);
-    }
-  }
-
-  free(endpoint);
-  curl_slist_free_all(headers);
-}
-
-/**
- * performs a PUT request to play the song
- * @param album_info - the album id for the data
- * @param album_position - offset in the album
- */
-void 
-play_song(char *album_info, char* album_position) {
-  CURL *curl;
-  CURLcode res;
-  struct curl_slist *headers = NULL;
-
-  char *SPOTIFY_PLAYER_URL = "https://api.spotify.com/v1/me/player/play";
-
-  /* we the offset needs to be set to the number minus 1 */
-  int pos = atoi(album_position);
-  pos--;
- 
-  /* turn the int to a char again */
-  char offset[2];
-  sprintf(offset, "%d", pos);
-
-  char *jsonObj;
-
-  char *json_obj_start = "{\"context_uri\":\"spotify:album:";
-  char *json_obj_mid = "\",\"offset\":{\"position\":";
-  char *json_obj_end = "},\"position_ms\":0}";
-
-  /* malloc sufficient space for the data so we can append all the values */
-  if ((jsonObj = malloc(strlen(json_obj_start) + strlen(album_info) + strlen(json_obj_mid) + 1 + strlen(json_obj_end) + 1)) != NULL) {
-    jsonObj[0] = '\0';
-
-    strcat(jsonObj, json_obj_start);
-    strcat(jsonObj, album_info);
-    strcat(jsonObj, json_obj_mid);
-    strcat(jsonObj, offset);
-    strcat(jsonObj, json_obj_end);
-  } else {
-    printf("malloc failed!\n");
-  }
-
-  headers = curl_slist_append(headers, "Accept: application/json");
-  headers = curl_slist_append(headers, "Content-Type: application/json");
-  headers = curl_slist_append(headers, "charset: utf-8");
-
-  /* token comes from toekn.h */
-  headers = curl_slist_append(headers, token);
-  curl = curl_easy_init();
-
-  if (curl) {
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonObj);
-    curl_easy_setopt(curl, CURLOPT_URL, SPOTIFY_PLAYER_URL);
-
-    res = curl_easy_perform(curl);
-
-    if (CURLE_OK == res) {
-      char *ct;
-      res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct);
-    }
-  }
-
-  free(jsonObj);
-  curl_slist_free_all(headers);
-}
+#define  GET    0
+#define  POST   1
+#define  PUT    2
+#define  DELETE 3
 
 /**
  * this function actually gets called multiple times, it gets called
@@ -256,4 +47,151 @@ size_t StoreData(char *contents, size_t size, size_t nmemb, void *user_struct) {
   json_res->data[json_res->current_size] = 0;
 
   return realsize;
+}
+
+void spotify_http(struct spotify_args *args) {
+  CURL *curl;
+  CURLcode res;
+  struct curl_slist *headers = NULL;
+
+  headers = curl_slist_append(headers, "Accept: application/json");
+  headers = curl_slist_append(headers, "Content-Type: application/json");
+  headers = curl_slist_append(headers, "charset: utf-8");
+
+  headers = curl_slist_append(headers, token);
+  curl = curl_easy_init();
+
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    
+    struct json_data web_data;
+    web_data.data = malloc(sizeof(char) * 16);
+    web_data.current_size = 0;
+    web_data.allocated_max_size = 16;
+
+    switch(args->http_type)
+    {
+      case GET:
+	curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
+	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, StoreData);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &web_data);
+
+	res = curl_easy_perform(curl);
+
+	args->search_struct->spotify_json_res = web_data.data;
+	break;
+      case POST:
+	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+	curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
+        res = curl_easy_perform(curl);
+	break;
+      case PUT:
+	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, args->search_struct->jsonObj);
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+	curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
+        res = curl_easy_perform(curl);
+	break;
+      case DELETE:
+	break;
+
+      default:
+	break;
+    }
+
+
+    if (CURLE_OK == res) {
+      char *ct;
+      res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct);
+    }
+  }
+
+  curl_slist_free_all(headers);
+}
+
+char *build_json_req(char *album_info, char* album_position){
+  /* we the offset needs to be set to the number minus 1 */
+  int pos = atoi(album_position);
+  pos--;
+ 
+  /* turn the int to a char again */
+  char offset[2];
+  sprintf(offset, "%d", pos);
+
+  char *jsonObj;
+
+  char *json_obj_start = "{\"context_uri\":\"spotify:album:";
+  char *json_obj_mid = "\",\"offset\":{\"position\":";
+  char *json_obj_end = "},\"position_ms\":0}";
+
+  /* malloc sufficient space for the data so we can append all the values */
+  if ((jsonObj = malloc(strlen(json_obj_start) + strlen(album_info) + strlen(json_obj_mid) + 1 + strlen(json_obj_end) + 1)) != NULL) {
+    jsonObj[0] = '\0';
+
+    strcat(jsonObj, json_obj_start);
+    strcat(jsonObj, album_info);
+    strcat(jsonObj, json_obj_mid);
+    strcat(jsonObj, offset);
+    strcat(jsonObj, json_obj_end);
+  } else {
+    printf("malloc failed!\n");
+  }
+
+  return jsonObj;
+}
+
+char *build_search_query(struct spotify_args *args)
+{
+  char *endpoint;
+
+  /* if we received a search query, then we prep the url */
+  /* else we just specify currenly playing */
+  char *encoded_string = url_encoder(args->search_struct->search_query, args->search_struct->is_query);
+
+  if ((endpoint = malloc(strlen(args->endpoint) + strlen(encoded_string) + 1)) != NULL) {
+    endpoint[0] = '\0';
+
+    strcat(endpoint, args->endpoint);
+    strcat(endpoint, encoded_string);
+  } 
+  else 
+  {
+    printf("malloc failed!\n");
+  }
+
+    return endpoint;
+}
+
+char * 
+build_put_request(char *album_info, char* album_position) {
+  /* we the offset needs to be set to the number minus 1 */
+  int pos = atoi(album_position);
+  pos--;
+ 
+  /* turn the int to a char again */
+  char offset[2];
+  sprintf(offset, "%d", pos);
+
+  char *jsonObj;
+
+  char *json_obj_start = "{\"context_uri\":\"spotify:album:";
+  char *json_obj_mid = "\",\"offset\":{\"position\":";
+  char *json_obj_end = "},\"position_ms\":0}";
+
+  /* malloc sufficient space for the data so we can append all the values */
+  if ((jsonObj = malloc(strlen(json_obj_start) + strlen(album_info) + strlen(json_obj_mid) + 1 + strlen(json_obj_end) + 1)) != NULL) {
+    jsonObj[0] = '\0';
+
+    strcat(jsonObj, json_obj_start);
+    strcat(jsonObj, album_info);
+    strcat(jsonObj, json_obj_mid);
+    strcat(jsonObj, offset);
+    strcat(jsonObj, json_obj_end);
+  } else {
+    printf("malloc failed!\n");
+  }
+
+  return jsonObj;
 }

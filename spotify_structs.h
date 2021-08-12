@@ -5,20 +5,30 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-struct args_type;
+struct spotify_args;
+struct spotify_search;
 struct get_url;
 struct json_data;
 struct song_info_node;
 struct available_song_node;
 struct search_song_request;
 
-/* comand line arguements types */
-struct args_type 
+struct spotify_args 
 {
-  bool display_song;
-  bool modify_player;
-  bool modify_change_song;
-  bool show_recently_played;
+  u_int8_t http_type;
+  bool http_get_write;
+  char *endpoint;
+  u_int8_t spotify_command;
+  struct spotify_search *search_struct;
+};
+
+/* comand line arguements types */
+struct spotify_search 
+{
+  char *search_query;
+  char *spotify_json_res;
+  char *jsonObj;
+  bool is_query;
 };
 
 struct get_url
@@ -26,6 +36,7 @@ struct get_url
   bool display_url;
   bool search_url;
   bool recent_url;
+  bool queue_url;
 };
 
 /* holds the received data from the packets */

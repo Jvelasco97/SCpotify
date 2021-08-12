@@ -6,13 +6,14 @@
  * @return the encoded url
  */
 char* 
-url_encoder(char* search) 
+url_encoder(char* search, bool query) 
 {
 
   int url_size = 0;
 
+  /* create str size based on special chars found */
   for(int i = 0; i < strlen(search); i++) {
-    if(*(search + i) == ' ') {
+    if(*(search + i) == ' '|| *(search + i) == ':' || *(search + i) == '\'') {
       url_size+=3;
     } else {
       url_size++;
@@ -29,7 +30,7 @@ url_encoder(char* search)
   const char comma[3] = {'%','2','C'};
 
   /* url colons */
-  const char apostraphe[3] = {'%','3','A'};
+  const char colon[3] = {'%','3','A'};
 
 
   ssize_t i = 0;
@@ -59,10 +60,10 @@ url_encoder(char* search)
 	*(new_str + j+2) = comma[2];
 	j+=3;
 	break;
-      case '\'':
-	*(new_str + j) = apostraphe[0];
-	*(new_str + j+1) = apostraphe[1];
-	*(new_str + j+2) = apostraphe[2];
+      case ':':
+	*(new_str + j) = colon[0];
+	*(new_str + j+1) = colon[1];
+	*(new_str + j+2) = colon[2];
 	j+=3;
 	break;
       default:
@@ -75,10 +76,39 @@ url_encoder(char* search)
   /* &type=track */
   /* add a space so we can append the rest */
   /* we can change the number of results here */
-  strcat(new_str, "&type=track&limit=5");
+  if(query) {
+    strcat(new_str, "&type=track&limit=5");
+  }
 
-  /* were returning a char * */
-  char *encoded_url = new_str;
+  char *encoded_url;
+  if ((encoded_url = malloc(strlen(new_str) + 1)) != NULL) {
+    encoded_url[0] = '\0';
+
+    memcpy(encoded_url, new_str, strlen(new_str));
+  } 
+  else 
+  {
+    printf("malloc failed!\n");
+  }
 
   return encoded_url;
+}
+
+char* 
+concat_strings(char *dest, char* to_append)
+{
+  char *concat_string;
+
+  if ((concat_string = malloc(strlen(dest) + strlen(to_append) + 1)) != NULL) {
+    concat_string[0] = '\0';
+
+    strcat(concat_string, dest);
+    strcat(concat_string, to_append);
+  } 
+  else 
+  {
+    printf("malloc failed!\n");
+  }
+
+  return concat_string;
 }
