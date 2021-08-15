@@ -73,6 +73,7 @@ void spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, s
       res = curl_easy_perform(curl);
 
       args->search_struct->spotify_json_res = web_data.data;
+      printf("%s\n", web_data.data);
       break;
     case POST:
       curl_setopt(curl, args, headers, "POST");
