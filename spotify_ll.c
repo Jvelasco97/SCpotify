@@ -282,6 +282,22 @@ print_avaible_songs(u_int8_t MAX_SEARCH)
   return req_node;
 }
 
+void
+clear_playlist()
+{
+  struct spotify_playlist *ptr = available_playlist_node; 
+  struct spotify_playlist *temp = NULL; 
+
+  while(ptr != NULL) {
+    temp = ptr;
+    ptr = ptr->next;
+    free(temp->playlist_name);
+    free(temp->playlist_owner);
+    free(temp->playlist_uri);
+    free(temp);
+  }
+}
+
 /**
  * frees all heap memory
  */
@@ -293,7 +309,7 @@ clear_linked_list()
   struct song_info_node *ptr = head; 
   
   /* holds the node that will be deleted */
-  struct song_info_node *temp; 
+  struct song_info_node *temp = NULL; 
 
   /* as long as we are referencing something, do it */
   while(ptr) {
@@ -313,7 +329,6 @@ clear_linked_list()
 /**
  * frees all heap memory
  */
-
 void 
 clear_search_list() 
 {

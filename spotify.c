@@ -5,12 +5,14 @@
  * @brief gets current playing song on spotify, more stuff soon, prob....
  */
 #include "main_includes.h"
+#include <stdlib.h>
 
 void spotify_play_playlist(struct spotify_args *cmd_args)
 {
   /* retrieve all playlists */
   spotify_http(cmd_args);
   parse_playlist_json(cmd_args->search_struct->spotify_json_res); 
+  free(cmd_args->search_struct->spotify_json_res);
 
   /* get the playlist uri for the playlist endpoint */
   cmd_args->search_struct->search_query = print_playlist();
@@ -21,6 +23,7 @@ void spotify_play_playlist(struct spotify_args *cmd_args)
 
   /* retrieve all songs from specific playlist */
   spotify_http(cmd_args);
+  free(cmd_args->endpoint);
 
   /* since the response object gives us the endpoint in the response object,  */
   /* we can return the string to it */
@@ -32,6 +35,8 @@ void spotify_play_playlist(struct spotify_args *cmd_args)
   cmd_args->http_type = PUT;
   cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play";
   spotify_http(cmd_args);
+  free(cmd_args->search_struct->jsonObj);
+  clear_playlist();
 }
 
 void spotify_show_current_song(struct spotify_args *cmd_args)
@@ -55,6 +60,7 @@ void spotify_play_song(struct spotify_args *cmd_args, struct search_song_request
   cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play";
   cmd_args->search_struct->jsonObj = build_put_request(req.track_info, req.track_position);
   spotify_http(cmd_args);
+  free(cmd_args->search_struct->jsonObj);
   clear_search_list();
 }
 
@@ -70,6 +76,7 @@ void spotify_play_recents(struct spotify_args *cmd_args, struct search_song_requ
   cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play";
   cmd_args->search_struct->jsonObj = build_put_request(req.track_info, req.track_position);
   spotify_http(cmd_args);
+  free(cmd_args->search_struct->jsonObj);
   clear_search_list();
 }
 
@@ -125,6 +132,7 @@ void spotifyC(struct spotify_args *cmd_args, struct search_song_request req)
       spotify_add_song_queue(cmd_args, req);
       break;
     default:
+      exit(EXIT_FAILURE);
       break;
   }
 }
