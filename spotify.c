@@ -5,7 +5,6 @@
  * @brief gets current playing song on spotify, more stuff soon, prob....
  */
 #include "main_includes.h"
-#include <stdlib.h>
 
 void spotify_play_playlist(struct spotify_args *cmd_args)
 {
@@ -132,7 +131,8 @@ void spotifyC(struct spotify_args *cmd_args, struct search_song_request req)
       spotify_add_song_queue(cmd_args, req);
       break;
     default:
-      exit(EXIT_FAILURE);
+      print_help();
+      exit(EXIT_SUCCESS);
       break;
   }
 }
@@ -154,13 +154,20 @@ int main(int argc, char **argv) {
   cmd_args->search_struct = search;
 
   /* process the command line options */
-  process_args(argc, argv, cmd_args);
+  if(argc > 1)
+  {
+    process_args(argc, argv, cmd_args);
 
-  /* call http and parse */
-  spotifyC(cmd_args, req);
+    /* call http and parse */
+    spotifyC(cmd_args, req);
 
-  free(search);
-  free(cmd_args);
+    free(search);
+    free(cmd_args);
+  } 
+  else
+  {
+    print_help();
+  }
 
   return 0;
 }

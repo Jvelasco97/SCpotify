@@ -4,5 +4,6 @@
 #include "spotify_structs.h"
 
 void process_args(int , char **, struct spotify_args *);
+void print_help();
 
 #endif

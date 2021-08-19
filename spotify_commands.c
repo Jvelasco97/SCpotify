@@ -4,6 +4,30 @@
 #include "includes.h"
 #include "spotify_command_defines.h"
 #include <getopt.h> 
+#include <stdlib.h>
+
+void print_help()
+{
+  fprintf(stderr,
+	  "spotify cli tool.\n"
+	  "Usage: spotifyC [options] ...\n"
+	  "   --now               \t\t displays currently-playing song.\n"
+	  "   --plist             \t\t Will prompt all your saved playlists and will then ask you which one you would like, to listen from. \
+	  \n                      \t\t you will then be asked what song you want to play.\n"
+	  "   -h 		  \t\t Show this help message and quit.\n"
+	  "   -p 		  \t\t pauses current player\n"
+	  "   -r 		  \t\t resumes current player if paused.\n"
+	  "   -n  		  \t\t skips to next available track.\n"
+	  "   -b                  \t\t goes back to previous track.\n"
+	  "   -s \"example song\" \t\t displays top 5 songs from query.\n"
+	  "   -q \"example song\" \t\t displays top 5 songs from query & adds it to your player.\n"
+	  "   -t                  \t\t displays previous 20 songs & prompts choice for player.\n"
+	  "   --vol <0-100>       \t\t sets the volume of player. (--vol 80)\n"
+	  "   --seek [option]     \t\t moves the player to specifc time stamp in ms. (--seek 23000)\n"
+	  "   --repeat [option]   \t\t sets the repeat state, must be value of, context, track, or off. (--repeat track)\n"
+	  "   --shuffle [option]  \t\t sets the shuffle option, must be either true or false. (--shuffle true)\n"
+	  "\nIssue are welcomed @ https://github.com/Jvelasco97/SCpotify\n");
+}
 
 void init_spotify_arg(struct spotify_args *args, char *endpoint, int command, int http_type)
 {
@@ -114,6 +138,8 @@ void process_args(int argc, char **argv, struct spotify_args *args)
   {
     switch (choice) 
     {
+    case -1:
+      break;
     case 0:
       handle_case_zero(long_options[option_index].name, args);
       break;
@@ -154,8 +180,15 @@ void process_args(int argc, char **argv, struct spotify_args *args)
       init_spotify_arg(args, "https://api.spotify.com/v1/search?q=", SPOTIFY_QUEUE, GET);
       enable_json_write(args);
       break;
+    case 'h':
+      print_help();
+      exit(EXIT_SUCCESS);
+      break;
+      
     /* unknown opt, just default to display */
     default:
+      print_help();
+      exit(EXIT_SUCCESS);
       break;
     }
   }
