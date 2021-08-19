@@ -1,22 +1,45 @@
 #include "spotify_parsers.h"
 #include "spotify_ll.h"
 #include "includes.h"
-#include <bits/getopt_core.h>
-#include <getopt.h> /* getopt */
 
-#define SPOTIFY_CURRENTLY_PLAYING 0
-#define SPOTIFY_PAUSE             1
-#define SPOTIFY_PLAY              2
-#define SPOTIFY_NEXT              3
-#define SPOTIFY_PREVIOUS          4
-#define SPOTIFY_SEARCH            5
-#define SPOTIFY_HISTORY           6
-#define SPOTIFY_QUEUE             7
+char *parse_selected_playlist_json(char *json_web_data)
+{
+  const char *json_anchor        = "tracks";
+  const char *endpoint           = "https://api.spotify.com/v1/playlists/";
+  const char *json_playlist_name = "name";
+  const char *json_track_info 	 = "is_local";
 
-#define GET    0
-#define POST   1
-#define PUT    2
-#define DELETE 3
+  char *json_position = json_web_data;
+  json_position = strstr(json_position, endpoint);
+  json_position = &(json_position[strlen(endpoint) - 1]);
+  u_int8_t distance = cut(json_position);
+  
+  json_position[distance] = 0;
+  char *ptr = malloc(sizeof(char) * (distance) + 1);
+  memcpy(ptr, json_position + 1, distance - 1);
+  ptr[distance] = 0;
+  json_position[distance] = ' ';
+
+  /* searches the whole string and finds the sub string
+   returns pointer to the beggining of the found string */
+  json_position = strstr(json_position, json_anchor);
+  json_position = &(json_position[strlen(json_anchor) - 1]);
+
+
+  while ((json_position = strstr(json_position, json_track_info))) {
+    struct spotify_playlist_songs *temp = 
+    (struct spotify_playlist_songs*) malloc(sizeof(struct spotify_playlist_songs));
+
+    temp->playlist_artist_name = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6);
+    temp->playlist_song_album  = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6);
+    insert_parsed_playlist_info(&json_position, &json_track_info, 0);
+    temp->playlist_song_name = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6);
+
+    insert_playlist_song_node(temp);
+  }
+
+  return ptr;
+}
 
 /**
  * gets info about currently playing song
@@ -108,6 +131,46 @@ parse_search_info(char *json_web_data)
     insert_search_node(temp);
   }
 }
+
+/**
+ * parses all the info we want about playlists available
+ * to search and possibly play
+ * @param json_web_data - the json response from the 
+ * /search endpoint
+ * @return none
+ */
+void 
+parse_playlist_json(char *json_web_data) 
+{
+  /* search pattern & ignore flag */
+  const char *json_anchor        = "images";
+  const char *json_playlist_name = "name";
+  const char *json_display_name  = "display_name";
+  const char *json_spotify_uri   = "spotify:playlist:";
+
+  char *json_position = json_web_data;
+
+  /* searches the whole string and finds the sub string
+   returns pointer to the beggining of the found string */
+  while ((json_position = strstr(json_position, json_anchor))) {
+    json_position = &(json_position[strlen(json_anchor) - 1]);
+
+    struct spotify_playlist *temp = 
+    (struct spotify_playlist*) malloc(sizeof(struct spotify_playlist));
+
+    /* strstr to first "name" and get the album name*/
+    temp->playlist_name = insert_parsed_data(&json_position, &json_playlist_name, 5);
+
+    /* strstr to album "name" and get the album api info*/
+    temp->playlist_owner = insert_parsed_data(&json_position, &json_display_name, 6);
+
+    /* go to "name" and extract author name */
+    temp->playlist_uri = insert_parsed_data(&json_position, &json_spotify_uri, 1);
+
+    insert_playlist_node(temp);
+  }
+}
+
 /**
  * parses all the info we want about the song that we want
  * to search and possibly play
@@ -120,10 +183,8 @@ parse_queue_search_info(char *json_web_data)
 {
   /* search pattern & ignore flag */
   const char *json_track_info = "spotify:track:";
-  /* const char *json_track_position = "\"track_number\""; */
   /* gets resued alot because alot of attributes have "name" in them */
   const char *find_artist = "\"name\"";
-  /* const char *find_song = "\"is_local\""; */
 
   char *json_position = json_web_data;
 
@@ -144,6 +205,32 @@ parse_queue_search_info(char *json_web_data)
   }
 }
 
+char *insert_parsed_playlist_info(char **json_position, const char **search, int displacement)
+{
+    *json_position = strstr(*json_position, *search);
+
+    /* if we dont return NULL then a garbage value will be */
+    /* and cause a segfault */
+    if(!(*json_position))
+    {
+      return NULL;
+    }
+    else
+    {
+      *json_position = *json_position + (strlen(*search) - 1) + displacement;
+    }
+
+    ssize_t distance = cut(*json_position);
+
+    /* plus one for the null */
+    char *ptr = malloc(sizeof(char) * (distance) + 1);
+    memcpy(ptr, *json_position, distance);
+
+    /* terminate the string as there is no previous terminator */
+    ptr[distance] = 0;
+
+    return ptr;
+}
 /**
  * calls the cut function so that we can extract the data
  * we want and allocate it for further use
@@ -168,7 +255,6 @@ char *insert_parsed_data(char **json_position, const char **search, int displace
 
   /* terminate the string as there is no previous terminator */
   ptr[distance] = 0;
-
 
   return ptr;
 }

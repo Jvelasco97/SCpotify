@@ -5,7 +5,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+struct spotify_playlist_songs;
 struct spotify_args;
+struct spotify_playlist;
 struct spotify_search;
 struct get_url;
 struct json_data;
@@ -29,6 +31,22 @@ struct spotify_search
   char *spotify_json_res;
   char *jsonObj;
   bool is_query;
+};
+
+struct spotify_playlist 
+{
+  char *playlist_name;
+  char *playlist_owner;
+  char *playlist_uri;
+  struct spotify_playlist *next;
+};
+
+struct spotify_playlist_songs 
+{
+  char *playlist_song_name;
+  char *playlist_artist_name;
+  char *playlist_song_album;
+  struct spotify_playlist_songs *next;
 };
 
 struct get_url

@@ -129,13 +129,13 @@ static void reverse(struct spotify_playlist_songs** head_ref)
 
   *head_ref = prev;
 }
+
 /**
  * prints all the nodes strings, has the parantheses wrapping
  * around them
  */
 u_int8_t print_playlist_songs() {
   struct spotify_playlist_songs *ptr = available_playlist_song_node;
-  struct spotify_playlist_songs *temp = NULL;
   reverse(&ptr);
 
   u_int8_t counter = 0;
@@ -146,12 +146,7 @@ u_int8_t print_playlist_songs() {
 	   "\x1B[31m",ptr->playlist_song_name,"\x1B[0m",
 	   "\x1B[34m",ptr->playlist_song_album,"\x1B[0m",
 	   "\x1B[33m",ptr->playlist_artist_name,"\x1B[0m");
-    temp = ptr;
     ptr = ptr->next;
-    free(temp->playlist_artist_name);
-    free(temp->playlist_song_album);
-    free(temp->playlist_song_name);
-    free(temp);
   }
 
   /* ask what song we want to play*/

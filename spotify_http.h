@@ -10,4 +10,5 @@ void play_song(char *, char *);
 void spotify_http(struct spotify_args *);
 char *build_search_query(struct spotify_args *);
 char *build_put_request(char *album_info, char* album_position);
+char *build_put_request_playlist(char *, int);
 #endif

@@ -1,12 +1,8 @@
 #include "spotify_http.h"
 #include "spotify_structs.h"
 #include "spotify_utils.h"
+#include "spotify_command_defines.h"
 #include "token.h"
-
-#define  GET    0
-#define  POST   1
-#define  PUT    2
-#define  DELETE 3
 
 /**
  * this function actually gets called multiple times, it gets called
@@ -17,7 +13,9 @@
  * @param user_struct - the struct that we will write to eventually
  * @return size of the packet
  */
-size_t StoreData(char *contents, size_t size, size_t nmemb, void *user_struct) {
+size_t 
+StoreData(char *contents, size_t size, size_t nmemb, void *user_struct) 
+{
   /* cast as our custom object */
   struct json_data *json_res = (struct json_data *)user_struct;
 
@@ -49,14 +47,16 @@ size_t StoreData(char *contents, size_t size, size_t nmemb, void *user_struct) {
   return realsize;
 }
 
-void curl_setopt(CURL *curl, struct spotify_args *args, struct curl_slist *headers, char *req_type)
+void 
+curl_setopt(CURL *curl, struct spotify_args *args, struct curl_slist *headers, char *req_type)
 {
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, req_type);
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
   curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
 }
 
-void spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, struct curl_slist *headers)
+void 
+spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, struct curl_slist *headers)
 {
   struct json_data web_data;
   web_data.data = malloc(sizeof(char) * 16);
@@ -73,7 +73,6 @@ void spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, s
       res = curl_easy_perform(curl);
 
       args->search_struct->spotify_json_res = web_data.data;
-      printf("%s\n", web_data.data);
       break;
     case POST:
       curl_setopt(curl, args, headers, "POST");
@@ -92,7 +91,8 @@ void spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, s
   }
 }
 
-void spotify_http(struct spotify_args *args) {
+void 
+spotify_http(struct spotify_args *args) {
   CURL *curl;
   CURLcode res = 0;
   struct curl_slist *headers = NULL;
@@ -118,7 +118,8 @@ void spotify_http(struct spotify_args *args) {
   curl_slist_free_all(headers);
 }
 
-char *build_search_query(struct spotify_args *args)
+char *
+build_search_query(struct spotify_args *args)
 {
   char *endpoint;
 
@@ -141,7 +142,8 @@ char *build_search_query(struct spotify_args *args)
 }
 
 char * 
-build_put_request(char *album_info, char* album_position) {
+build_put_request(char *album_info, char* album_position) 
+{
   /* we the offset needs to be set to the number minus 1 */
   int pos = atoi(album_position);
   pos--;
@@ -157,11 +159,43 @@ build_put_request(char *album_info, char* album_position) {
   char *json_obj_end = "},\"position_ms\":0}";
 
   /* malloc sufficient space for the data so we can append all the values */
-  if ((jsonObj = malloc(strlen(json_obj_start) + strlen(album_info) + strlen(json_obj_mid) + 1 + strlen(json_obj_end) + 1)) != NULL) {
+  if ((jsonObj = malloc(strlen(json_obj_start) + strlen(album_info) + strlen(json_obj_mid) + 1 + strlen(json_obj_end) + 1)) != NULL) 
+  {
     jsonObj[0] = '\0';
 
     strcat(jsonObj, json_obj_start);
     strcat(jsonObj, album_info);
+    strcat(jsonObj, json_obj_mid);
+    strcat(jsonObj, offset);
+    strcat(jsonObj, json_obj_end);
+  } else {
+    printf("malloc failed!\n");
+  }
+
+  return jsonObj;
+}
+
+char * 
+build_put_request_playlist(char *playlist_uri, int album_position) 
+{
+  /* we the offset needs to be set to the number minus 1 */
+ 
+  char *jsonObj;
+
+  char *offset;
+  sprintf(offset, "%d", album_position);
+
+  char *json_obj_start = "{\"context_uri\":\"spotify:playlist:";
+  char *json_obj_mid = "\",\"offset\":{\"position\":";
+  char *json_obj_end = "},\"position_ms\":0}";
+
+  /* malloc sufficient space for the data so we can append all the values */
+  if ((jsonObj = malloc(strlen(json_obj_start) + strlen(playlist_uri) + strlen(json_obj_mid) + strlen(offset) + strlen(json_obj_end) + 1)) != NULL) 
+  {
+    jsonObj[0] = '\0';
+
+    strcat(jsonObj, json_obj_start);
+    strcat(jsonObj, playlist_uri);
     strcat(jsonObj, json_obj_mid);
     strcat(jsonObj, offset);
     strcat(jsonObj, json_obj_end);

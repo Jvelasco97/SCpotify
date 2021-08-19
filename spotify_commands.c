@@ -2,21 +2,8 @@
 #include "spotify_structs.h"
 #include "spotify_utils.h"
 #include "includes.h"
+#include "spotify_command_defines.h"
 #include <getopt.h> 
-
-#define SPOTIFY_CURRENTLY_PLAYING 0
-#define SPOTIFY_PAUSE             1
-#define SPOTIFY_PLAY              2
-#define SPOTIFY_NEXT              3
-#define SPOTIFY_PREVIOUS          4
-#define SPOTIFY_SEARCH            5
-#define SPOTIFY_HISTORY           6
-#define SPOTIFY_QUEUE             7
-
-#define GET    0
-#define POST   1
-#define PUT    2
-#define DELETE 3
 
 void init_spotify_arg(struct spotify_args *args, char *endpoint, int command, int http_type)
 {
@@ -82,7 +69,13 @@ void handle_case_zero(const char * option, struct spotify_args *args )
     args->endpoint = concat_strings(args->endpoint, optarg);
     change_player_status(args);
   }
-
+  else if(strcmp("plist", option) == 0)
+  {
+    args->endpoint = "https://api.spotify.com/v1/me/playlists?limit=30";
+    args->spotify_command = SPOTIFY_PLAYLIST;
+    args->http_type = GET;
+    args->http_get_write = true;
+  }
   else if(strcmp("now", option) == 0)
   {
     args->endpoint = "https://api.spotify.com/v1/me/player/currently-playing";
@@ -113,6 +106,7 @@ void process_args(int argc, char **argv, struct spotify_args *args)
       {"shuffle",    required_argument, NULL,  0  },
       {"seek",       required_argument, NULL,  0  },
       {"vol",        required_argument, NULL,  0  },
+      {"plist",      no_argument,       NULL,  0  },
       {NULL,         0,                 NULL,  0  }
   };
 

@@ -6,19 +6,33 @@
  */
 #include "main_includes.h"
 
-#define SPOTIFY_CURRENTLY_PLAYING 0
-#define SPOTIFY_PAUSE             1
-#define SPOTIFY_PLAY              2
-#define SPOTIFY_NEXT              3
-#define SPOTIFY_PREVIOUS          4
-#define SPOTIFY_SEARCH            5
-#define SPOTIFY_HISTORY           6
-#define SPOTIFY_QUEUE             7
+void spotify_play_playlist(struct spotify_args *cmd_args)
+{
+  /* retrieve all playlists */
+  spotify_http(cmd_args);
+  parse_playlist_json(cmd_args->search_struct->spotify_json_res); 
 
-#define  GET    0
-#define  POST   1
-#define  PUT    2
-#define  DELETE 3
+  /* get the playlist uri for the playlist endpoint */
+  cmd_args->search_struct->search_query = print_playlist();
+  cmd_args->endpoint = "https://api.spotify.com/v1/playlists/";
+
+  /* append the search query and endpoint */
+  cmd_args->endpoint = build_search_query(cmd_args);
+
+  /* retrieve all songs from specific playlist */
+  spotify_http(cmd_args);
+
+  /* since the response object gives us the endpoint in the response object,  */
+  /* we can return the string to it */
+  cmd_args->endpoint = parse_selected_playlist_json(cmd_args->search_struct->spotify_json_res);
+  u_int8_t playlist_position = print_playlist_songs();
+  cmd_args->search_struct->jsonObj = build_put_request_playlist(cmd_args->endpoint, playlist_position);
+
+  /* change http type to PUT as we are going to play a song */
+  cmd_args->http_type = PUT;
+  cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play";
+  spotify_http(cmd_args);
+}
 
 void spotify_show_current_song(struct spotify_args *cmd_args)
 {
@@ -88,6 +102,9 @@ void spotifyC(struct spotify_args *cmd_args, struct search_song_request req)
       break;
     case SPOTIFY_PLAY:
       spotify_http(cmd_args);
+      break;
+    case SPOTIFY_PLAYLIST:
+      spotify_play_playlist(cmd_args);
       break;
     case SPOTIFY_PAUSE:
       spotify_http(cmd_args);
