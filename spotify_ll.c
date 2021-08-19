@@ -108,6 +108,10 @@ void printList() {
    printf("\n");
 }
 
+/**
+ * prints all the nodes strings, has the parantheses wrapping
+ * around them
+ */
 static void reverse(struct spotify_playlist_songs** head_ref)
 {
   struct spotify_playlist_songs* prev = NULL;
