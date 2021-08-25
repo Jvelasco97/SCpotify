@@ -3,6 +3,7 @@
 #include "spotify_utils.h"
 #include "spotify_command_defines.h"
 #include "token.h"
+#include <curl/curl.h>
 
 /**
  * this function actually gets called multiple times, it gets called
@@ -52,16 +53,25 @@ curl_setopt(CURL *curl, struct spotify_args *args, struct curl_slist *headers, c
 {
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, req_type);
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+  printf("%s\n", args->endpoint);
   curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
 }
 
 void 
 spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, struct curl_slist *headers)
 {
-  struct json_data web_data;
-  web_data.data = malloc(sizeof(char) * 16);
-  web_data.current_size = 0;
-  web_data.allocated_max_size = 16;
+  struct json_data web_data = {
+    .data               = NULL,
+    .current_size       = 0,
+    .allocated_max_size = 0
+  };
+
+  if(args->http_get_write)
+  {
+    web_data.data = malloc(sizeof(char) * 16);
+    web_data.current_size = 0;
+    web_data.allocated_max_size = 16;
+  }
 
   switch(args->http_type)
   {
@@ -76,6 +86,7 @@ spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, struct
       break;
     case POST:
       curl_setopt(curl, args, headers, "POST");
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, args->search_struct->jsonObj);
       res = curl_easy_perform(curl);
       break;
     case PUT:
@@ -115,17 +126,19 @@ spotify_http(struct spotify_args *args) {
     }
   }
 
+  curl_easy_cleanup(curl);
   curl_slist_free_all(headers);
 }
 
 char *
 build_search_query(struct spotify_args *args)
 {
-  char *endpoint;
+  char *endpoint = NULL;
 
   /* if we received a search query, then we prep the url */
   /* else we just specify currenly playing */
-  char *encoded_string = url_encoder(args->search_struct->search_query, args->search_struct->is_query);
+  char *encoded_string = NULL;
+  encoded_string = url_encoder(args->search_struct->search_query, args->search_struct->query_type);
 
   if ((endpoint = malloc(strlen(args->endpoint) + strlen(encoded_string) + 1)) != NULL) {
     endpoint[0] = '\0';
@@ -138,7 +151,8 @@ build_search_query(struct spotify_args *args)
     printf("malloc failed!\n");
   }
 
-    return endpoint;
+  free(encoded_string);
+  return endpoint;
 }
 
 char * 
@@ -182,7 +196,7 @@ build_put_request_playlist(char *playlist_uri, int album_position)
  
   char *jsonObj;
 
-  char *offset;
+  char offset[2];
   sprintf(offset, "%d", album_position);
 
   char *json_obj_start = "{\"context_uri\":\"spotify:playlist:";

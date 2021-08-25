@@ -10,14 +10,17 @@ char *parse_selected_playlist_json(char *json_web_data)
   const char *json_track_info 	 = "is_local";
 
   char *json_position = json_web_data;
+
   json_position = strstr(json_position, endpoint);
   json_position = &(json_position[strlen(endpoint) - 1]);
+
   u_int8_t distance = cut(json_position);
-  
   json_position[distance] = 0;
-  char *ptr = malloc(sizeof(char) * (distance) + 1);
+
+  char *ptr = calloc(distance, sizeof(char));
+
   memcpy(ptr, json_position + 1, distance - 1);
-  ptr[distance] = 0;
+
   json_position[distance] = ' ';
 
   /* searches the whole string and finds the sub string
@@ -30,10 +33,10 @@ char *parse_selected_playlist_json(char *json_web_data)
     struct spotify_playlist_songs *temp = 
     (struct spotify_playlist_songs*) malloc(sizeof(struct spotify_playlist_songs));
 
-    temp->playlist_artist_name = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6);
-    temp->playlist_song_album  = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6);
-    insert_parsed_playlist_info(&json_position, &json_track_info, 0);
-    temp->playlist_song_name = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6);
+    temp->playlist_artist_name = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6, true);
+    temp->playlist_song_album  = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6, true);
+    insert_parsed_playlist_info(&json_position, &json_track_info, 0, false);
+    temp->playlist_song_name = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6, true);
 
     insert_playlist_song_node(temp);
   }
@@ -111,22 +114,22 @@ parse_search_info(char *json_web_data)
     (struct available_song_node*) malloc(sizeof(struct available_song_node));
 
     /* strstr to first "name" and get the album name*/
-    temp->album_name = insert_parsed_data(&json_position, &find_artist, 5);
+    temp->album_name = insert_parsed_data(&json_position, &find_artist, 5, true);
 
     /* strstr to album "name" and get the album api info*/
-    temp->album_api_info = insert_parsed_data(&json_position, &json_album_info, 1);
+    temp->album_api_info = insert_parsed_data(&json_position, &json_album_info, 1, true);
 
     /* go to "name" and extract author name */
-    temp->artist_info = insert_parsed_data(&json_position, &find_artist, 5);
+    temp->artist_info = insert_parsed_data(&json_position, &find_artist, 5, true);
 
     /* go to "song" and then call function again to get the "name" */
-    insert_parsed_data(&json_position, &find_song, 5);
+    insert_parsed_data(&json_position, &find_song, 5, false);
 
     /* go to "name" and get the song name */
-    temp->song_title = insert_parsed_data(&json_position, &find_artist, 5);
+    temp->song_title = insert_parsed_data(&json_position, &find_artist, 5, true);
 
     /* go to "track" and get the track position */
-    temp->album_position = insert_parsed_data(&json_position, &json_track_position, 4); 
+    temp->album_position = insert_parsed_data(&json_position, &json_track_position, 4, true); 
 
     insert_search_node(temp);
   }
@@ -159,13 +162,13 @@ parse_playlist_json(char *json_web_data)
     (struct spotify_playlist*) malloc(sizeof(struct spotify_playlist));
 
     /* strstr to first "name" and get the album name*/
-    temp->playlist_name = insert_parsed_data(&json_position, &json_playlist_name, 5);
+    temp->playlist_name = insert_parsed_data(&json_position, &json_playlist_name, 5, true);
 
     /* strstr to album "name" and get the album api info*/
-    temp->playlist_owner = insert_parsed_data(&json_position, &json_display_name, 6);
+    temp->playlist_owner = insert_parsed_data(&json_position, &json_display_name, 6, true);
 
     /* go to "name" and extract author name */
-    temp->playlist_uri = insert_parsed_data(&json_position, &json_spotify_uri, 1);
+    temp->playlist_uri = insert_parsed_data(&json_position, &json_spotify_uri, 1, true);
 
     insert_playlist_node(temp);
   }
@@ -196,16 +199,16 @@ parse_queue_search_info(char *json_web_data)
     struct available_song_node *temp = 
     (struct available_song_node*) malloc(sizeof(struct available_song_node));
 
-    temp->song_title = insert_parsed_data(&json_position, &find_artist, 5);
-    temp->album_name = insert_parsed_data(&json_position, &find_artist, 5);
-    temp->artist_info = insert_parsed_data(&json_position, &find_artist, 5);
-    temp->album_api_info = insert_parsed_data(&json_position, &json_track_info, 1);
+    temp->album_name = insert_parsed_data(&json_position, &find_artist, 5, true);
+    temp->artist_info = insert_parsed_data(&json_position, &find_artist, 5, true);
+    temp->song_title = insert_parsed_data(&json_position, &find_artist, 5, true);
+    temp->album_api_info = insert_parsed_data(&json_position, &json_track_info, 1, true);
 
     insert_search_node(temp);
   }
 }
 
-char *insert_parsed_playlist_info(char **json_position, const char **search, int displacement)
+char *insert_parsed_playlist_info(char **json_position, const char **search, int displacement, bool insert)
 {
     *json_position = strstr(*json_position, *search);
 
@@ -220,6 +223,169 @@ char *insert_parsed_playlist_info(char **json_position, const char **search, int
       *json_position = *json_position + (strlen(*search) - 1) + displacement;
     }
 
+    if(insert)
+    {
+      ssize_t distance = cut(*json_position);
+
+      /* plus one for the null */
+      char *ptr = malloc(sizeof(char) * (distance) + 1);
+      memcpy(ptr, *json_position, distance);
+
+      /* terminate the string as there is no previous terminator */
+      ptr[distance] = 0;
+
+      return ptr;
+    }
+
+    return NULL;
+}
+
+void parse_top_tracks(char *json_web_data)
+{
+  /* search pattern & ignore flag */
+  const char *anchor = "https://api.spotify.com/v1/artists/";
+  /* gets resued alot because alot of attributes have "name" in them */
+  const char *find_name = "\"name\"";
+
+  char *json_position = json_web_data;
+
+  /* searches the whole string and finds the sub string
+   returns pointer to the beggining of the found string */
+  while ((json_position = strstr(json_position, anchor))) {
+    json_position = &(json_position[strlen(anchor) - 1]);
+    (json_position = strstr(json_position, anchor));
+    json_position = &(json_position[strlen(anchor) - 1]);
+
+    struct spotify_top_tracks *temp = 
+    (struct spotify_top_tracks*) malloc(sizeof(struct spotify_top_tracks));
+
+    temp->artist_name = insert_parsed_data(&json_position, &find_name, 5, true);
+    temp->song_name = insert_parsed_data(&json_position, &find_name, 5, true);
+
+    insert_top_track_node(temp);
+  }
+}
+
+char * 
+parse_artist_id(char *json_web_data)
+{
+  /* search pattern & ignore flag */
+  const char *anchor = "\"id\" : \"";
+
+  char *json_position = json_web_data;
+
+  /* searches the whole string and finds the sub string
+   returns pointer to the beggining of the found string */
+  
+  json_position = strstr(json_position, anchor);
+  json_position = json_position + strlen(anchor);
+
+  ssize_t distance = cut(json_position);
+
+  /* plus one for the null */
+  char *ptr = malloc(sizeof(char) * (distance) + 1);
+  memcpy(ptr, json_position, distance);
+
+  /* terminate the string as there is no previous terminator */
+  ptr[distance] = 0;
+
+  return ptr;
+}
+
+void parse_related_artists(char *json_web_data)
+{
+  /* search pattern & ignore flag */
+  const char *find_genre = "\"genres\" : ";
+  /* gets resued alot because alot of attributes have "name" in them */
+  const char *find_name = "\"name\"";
+
+  char *json_position = json_web_data;
+
+  /* searches the whole string and finds the sub string
+   returns pointer to the beggining of the found string */
+  while ((json_position = strstr(json_position, find_genre))) {
+    json_position = &(json_position[strlen(find_genre) - 1]);
+
+    struct spotify_related_artists *temp = 
+    (struct spotify_related_artists*) malloc(sizeof(struct spotify_related_artists));
+
+    temp->genre_array = insert_parsed_data(&json_position, &find_genre, 2, true);
+    temp->artist_name = insert_parsed_data(&json_position, &find_name, 5, true);
+
+    insert_related_artist_node(temp);
+  }
+}
+
+void parse_searched_artists(char *json_web_data)
+{
+  /* search pattern & ignore flag */
+  const char *find_genre = "\"genres\" : ";
+  /* gets resued alot because alot of attributes have "name" in them */
+  const char *find_name = "\"name\"";
+  const char *find_id = "\"id\"";
+
+  char *json_position = json_web_data;
+
+  /* searches the whole string and finds the sub string
+   returns pointer to the beggining of the found string */
+  while ((json_position = strstr(json_position, find_genre))) {
+    json_position = &(json_position[strlen(find_genre) - 1]);
+
+    struct spotify_related_artists *temp = 
+    (struct spotify_related_artists*) malloc(sizeof(struct spotify_related_artists));
+
+    temp->artists_id = insert_parsed_data(&json_position, &find_id, 5, true);
+    temp->artist_name = insert_parsed_data(&json_position, &find_name, 5, true);
+
+    insert_related_artist_node(temp);
+  }
+}
+
+void parse_top_artists(char *json_web_data)
+{
+  const char *find_name = "\"name\"";
+
+  char *json_position = json_web_data;
+
+  /* searches the whole string and finds the sub string
+   returns pointer to the beggining of the found string */
+  while ((json_position = strstr(json_position, find_name))) {
+    json_position = &(json_position[strlen(find_name) - 1]);
+
+    struct spotify_top_artists *temp = 
+    (struct spotify_top_artists*) malloc(sizeof(struct spotify_top_artists));
+
+    temp->artist_name = insert_top_artist(&json_position, &find_name);
+
+    insert_top_artist_node(temp);
+  }
+}
+
+/**
+ * calls the cut function so that we can extract the data
+ * we want and allocate it for further use
+ * @param json_position the json that we are traversing
+ * @searh the search query we want for the json object
+ * @displacement skip over unwanted characters
+ * @return heap allocated char * of the data we wanted
+ */
+char *insert_parsed_data(char **json_position, const char **search, int displacement, bool insert) 
+{
+  /* move the pointer to desired value in json obj */
+  *json_position = strstr(*json_position, *search);
+  if(*json_position == NULL){
+    return NULL;
+  } 
+  else 
+  {
+    *json_position = *json_position + (strlen(*search) - 1) + displacement;
+  }
+  /* add displacement to skipp unwanted garbage */
+
+  /* use this function to search for certain delimiters and 'cut' */
+  /* the string later */
+  if(insert)
+  {
     ssize_t distance = cut(*json_position);
 
     /* plus one for the null */
@@ -230,20 +396,16 @@ char *insert_parsed_playlist_info(char **json_position, const char **search, int
     ptr[distance] = 0;
 
     return ptr;
+  }
+
+  return NULL;
 }
-/**
- * calls the cut function so that we can extract the data
- * we want and allocate it for further use
- * @param json_position the json that we are traversing
- * @searh the search query we want for the json object
- * @displacement skip over unwanted characters
- * @return heap allocated char * of the data we wanted
- */
-char *insert_parsed_data(char **json_position, const char **search, int displacement) {
-  /* move the pointer to desired value in json obj */
-  *json_position = strstr(*json_position, *search);
-  *json_position = *json_position + (strlen(*search) - 1) + displacement;
+
+char *
+insert_top_artist(char **json_position, const char **search) 
+{
   /* add displacement to skipp unwanted garbage */
+  *json_position = *json_position + (strlen(*search) - 1);
 
   /* use this function to search for certain delimiters and 'cut' */
   /* the string later */
@@ -279,7 +441,10 @@ cut(char *artist_info)
     } else if(artist_info[i + 1] == ',' && artist_info[i + 2] == '\n') {
       /* pre increment as we want the return value incremented before hand */
       return ++distance;
-    } else if(artist_info[i + 1] == '\"' && artist_info[i + 2] == ',') {
+    } else if(artist_info[i + 1] == ']' && artist_info[i + 2] == ',' && artist_info[i+3] == '\n') {
+      /* pre increment as we want the return value incremented before hand */
+      return ++distance;
+    } else if(artist_info[i + 1] == '\"' && artist_info[i + 2] == ',' && artist_info[i+3] == '\n') {
       /* pre increment as we want the return value incremented before hand */
       return ++distance;
     }

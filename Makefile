@@ -1,4 +1,5 @@
-CFLAGS = -Wall -lcurl
+# CFLAGS = -Wall -lcurl -fsanitize=address -g 
+CFLAGS = -Wall -lcurl -g -Wall -Werror
 
 all: spotifyC
 

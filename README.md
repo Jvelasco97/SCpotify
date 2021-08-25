@@ -37,7 +37,7 @@ Will display past 20 songs
 `spotifyC -q "example song"`  
 Will seach and prompt what song to add in queue  
 
-`spotifyC --plist`
+`spotifyC --plist`  
 Will prompt all your saved playlists and will then  
 ask you which one you would like, to listen from.  
 you will then be asked what song you want to play.  
@@ -58,12 +58,13 @@ you will then be asked what song you want to play.
 - [X] volume functionality
 - [X] previously played functionality
 - [X] add song to current player
+- [] get current context and prompt to play song from it
 
 ### Personalization
-- [ ] display top artists and songs
+- [X] display top artists and songs
 
 ### Artists
-- [ ] display related artists 
+- [X] display related artists 
 - [ ] display artists and play song
 
 ### Albums
