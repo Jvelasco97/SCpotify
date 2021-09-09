@@ -2,16 +2,16 @@
 #include "spotify_structs.h"
 
 static struct 
-song_info_node *head = NULL;
+song_info_node *song_info_head = NULL;
 
 static struct 
-available_song_node *available_node = NULL;
+spotify_song_search_node *available_song_search_head = NULL;
 
 static struct 
-spotify_playlist *available_playlist_node = NULL;
+spotify_playlist_context *available_playlist_head = NULL;
 
 static struct 
-spotify_playlist_songs *available_playlist_song_node = NULL;
+spotify_playlist_songs *available_playlist_song_head = NULL;
 
 static struct 
 spotify_top_tracks *spotify_top_track_head = NULL;
@@ -45,10 +45,10 @@ insert_node(char* song_info, ssize_t size)
   node->data = dest;
 
   /* point to previous head */
-  node->next = head;
+  node->next = song_info_head;
 
   /* new head */
-  head = node;
+  song_info_head = node;
 }
 
 /**
@@ -59,13 +59,13 @@ insert_node(char* song_info, ssize_t size)
  * @param song_info - song title for display purposes
  */
 void 
-insert_search_node(struct available_song_node *node) 
+insert_search_node(struct spotify_song_search_node *node) 
 {
   /* point to previous head */
-  node->next = available_node;
+  node->next = available_song_search_head;
 
   /* new head */
-  available_node = node;
+  available_song_search_head = node;
 }
 
 /**
@@ -76,13 +76,13 @@ insert_search_node(struct available_song_node *node)
  * @param song_info - song title for display purposes
  */
 void 
-insert_playlist_node(struct spotify_playlist *node) 
+insert_playlist_node(struct spotify_playlist_context *node) 
 {
   /* point to previous head */
-  node->next = available_playlist_node;
+  node->next = available_playlist_head;
 
   /* new head */
-  available_playlist_node = node;
+  available_playlist_head = node;
 }
 
 /**
@@ -96,10 +96,10 @@ void
 insert_playlist_song_node(struct spotify_playlist_songs *node) 
 {
   /* point to previous head */
-  node->next = available_playlist_song_node;
+  node->next = available_playlist_song_head;
 
   /* new head */
-  available_playlist_song_node = node;
+  available_playlist_song_head = node;
 }
 
 void 
@@ -144,7 +144,7 @@ insert_top_artist_node(struct spotify_top_artists *node)
  * around them
  */
 void printList() {
-  struct song_info_node *ptr = head;
+  struct song_info_node *ptr = song_info_head;
 
   while(ptr != NULL) {
     printf("(%s) ",ptr->data);
@@ -322,7 +322,7 @@ reverse_top_artists(struct spotify_top_artists** spotify_top_artist_head)
  * around them
  */
 u_int8_t print_playlist_songs() {
-  struct spotify_playlist_songs *ptr = available_playlist_song_node;
+  struct spotify_playlist_songs *ptr = available_playlist_song_head;
   struct spotify_playlist_songs *temp = NULL;
   reverse(&ptr);
 
@@ -332,12 +332,12 @@ u_int8_t print_playlist_songs() {
     printf("%s[%d]%s %s%s%s (%s%s%s) by %s%s%s\n",
 	   "\x1B[36m",counter++,"\x1B[0m",
 	   "\x1B[31m",ptr->playlist_song_name,"\x1B[0m",
-	   "\x1B[34m",ptr->playlist_song_album,"\x1B[0m",
+	   "\x1B[34m",ptr->playlist_album_name,"\x1B[0m",
 	   "\x1B[33m",ptr->playlist_artist_name,"\x1B[0m");
     temp = ptr;
     ptr = ptr->next;
     free(temp->playlist_artist_name);
-    free(temp->playlist_song_album);
+    free(temp->playlist_album_name);
     free(temp->playlist_song_name);
     free(temp);
   }
@@ -363,7 +363,7 @@ u_int8_t print_playlist_songs() {
  * around them
  */
 char *print_playlist() {
-  struct spotify_playlist *ptr = available_playlist_node; 
+  struct spotify_playlist_context *ptr = available_playlist_head; 
 
   u_int8_t counter = 0;
 
@@ -390,7 +390,7 @@ char *print_playlist() {
   }
 
   counter = 0;
-  ptr = available_playlist_node;
+  ptr = available_playlist_head;
   while(ptr != NULL) {
     if(counter == choice) {
       return ptr->playlist_uri;
@@ -411,10 +411,10 @@ char *print_playlist() {
  * around them
  */
 
-struct search_song_request 
+struct spotify_song_query_info 
 print_avaible_songs(u_int8_t MAX_SEARCH) 
 {
-  struct available_song_node *ptr = available_node;
+  struct spotify_song_search_node *ptr = available_song_search_head;
 
   /* used to point to the node that we want album info from */
   u_int8_t counter = 0;
@@ -423,7 +423,7 @@ print_avaible_songs(u_int8_t MAX_SEARCH)
   /* char *album_id; */
   /* char *album_position; */
 
-  struct search_song_request req_node = {
+  struct spotify_song_query_info req_node = {
     .track_info = NULL,
     .track_position = NULL
   };
@@ -439,7 +439,7 @@ print_avaible_songs(u_int8_t MAX_SEARCH)
   }
 
   /* reset so we can fetch the index position */
-  ptr = available_node;
+  ptr = available_song_search_head;
   counter = 0;
   
   /* ask what song we want to play*/
@@ -472,8 +472,8 @@ print_avaible_songs(u_int8_t MAX_SEARCH)
 void
 clear_playlist()
 {
-  struct spotify_playlist *ptr = available_playlist_node; 
-  struct spotify_playlist *temp = NULL; 
+  struct spotify_playlist_context *ptr = available_playlist_head; 
+  struct spotify_playlist_context *temp = NULL; 
 
   while(ptr != NULL) {
     temp = ptr;
@@ -493,7 +493,7 @@ void
 clear_linked_list() 
 {
   /* we dont want to mess with the actual head */
-  struct song_info_node *ptr = head; 
+  struct song_info_node *ptr = song_info_head; 
   
   /* holds the node that will be deleted */
   struct song_info_node *temp = NULL; 
@@ -510,7 +510,7 @@ clear_linked_list()
     free(temp);
   }
 
-  head = NULL;
+  song_info_head = NULL;
 }
 
 /**
@@ -521,10 +521,10 @@ clear_search_list()
 {
   
   /* we dont want to mess with the actual head */
-  struct available_song_node *ptr = available_node; 
+  struct spotify_song_search_node *ptr = available_song_search_head; 
   
   /* holds the node that will be deleted */
-  struct available_song_node *temp; 
+  struct spotify_song_search_node *temp; 
 
   /* as long as we are referencing something, do it */
   while(ptr) {
@@ -542,7 +542,7 @@ clear_search_list()
     free(temp);
   }
 
-  available_node = NULL;
+  available_song_search_head = NULL;
 }
 
 /**

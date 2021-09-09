@@ -1,6 +1,3 @@
-#include "spotify_http.h"
-#include "spotify_parsers.h"
-#include "spotify_ll.h"
 #include "spotify_structs.h"
 #include "spotify_commands.h"
-#include "spotify_command_defines.h"
+#include "spotify_client_functions.h"

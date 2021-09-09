@@ -1,5 +1,4 @@
-# CFLAGS = -Wall -lcurl -fsanitize=address -g 
-CFLAGS = -Wall -lcurl -g -Wall -Werror
+CFLAGS = -Wall -lcurl -ansi -std=c11 -Werror -O3 -pipe -fstack-protector-strong -Wpedantic
 
 all: spotifyC
 

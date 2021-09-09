@@ -1,6 +1,7 @@
 #include "spotify_parsers.h"
 #include "spotify_ll.h"
 #include "includes.h"
+#include <string.h>
 
 char *parse_selected_playlist_json(char *json_web_data)
 {
@@ -34,7 +35,7 @@ char *parse_selected_playlist_json(char *json_web_data)
     (struct spotify_playlist_songs*) malloc(sizeof(struct spotify_playlist_songs));
 
     temp->playlist_artist_name = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6, true);
-    temp->playlist_song_album  = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6, true);
+    temp->playlist_album_name  = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6, true);
     insert_parsed_playlist_info(&json_position, &json_track_info, 0, false);
     temp->playlist_song_name = insert_parsed_playlist_info(&json_position, &json_playlist_name, 6, true);
 
@@ -110,8 +111,8 @@ parse_search_info(char *json_web_data)
   while ((json_position = strstr(json_position, find_artist))) {
     json_position = &(json_position[strlen(find_artist) - 1]);
 
-    struct available_song_node *temp = 
-    (struct available_song_node*) malloc(sizeof(struct available_song_node));
+    struct spotify_song_search_node *temp = 
+    (struct spotify_song_search_node*) malloc(sizeof(struct spotify_song_search_node));
 
     /* strstr to first "name" and get the album name*/
     temp->album_name = insert_parsed_data(&json_position, &find_artist, 5, true);
@@ -158,8 +159,8 @@ parse_playlist_json(char *json_web_data)
   while ((json_position = strstr(json_position, json_anchor))) {
     json_position = &(json_position[strlen(json_anchor) - 1]);
 
-    struct spotify_playlist *temp = 
-    (struct spotify_playlist*) malloc(sizeof(struct spotify_playlist));
+    struct spotify_playlist_context *temp = 
+    (struct spotify_playlist_context*) malloc(sizeof(struct spotify_playlist_context));
 
     /* strstr to first "name" and get the album name*/
     temp->playlist_name = insert_parsed_data(&json_position, &json_playlist_name, 5, true);
@@ -196,8 +197,8 @@ parse_queue_search_info(char *json_web_data)
   while ((json_position = strstr(json_position, find_artist))) {
     json_position = &(json_position[strlen(find_artist) - 1]);
 
-    struct available_song_node *temp = 
-    (struct available_song_node*) malloc(sizeof(struct available_song_node));
+    struct spotify_song_search_node *temp = 
+    (struct spotify_song_search_node*) malloc(sizeof(struct spotify_song_search_node));
 
     temp->album_name = insert_parsed_data(&json_position, &find_artist, 5, true);
     temp->artist_info = insert_parsed_data(&json_position, &find_artist, 5, true);
@@ -417,6 +418,20 @@ insert_top_artist(char **json_position, const char **search)
 
   /* terminate the string as there is no previous terminator */
   ptr[distance] = 0;
+
+  return ptr;
+}
+
+char *parse_auth_token(char **json_res)
+{
+
+  //point to start, then point to end
+  //use malloc and memcpy to it
+  
+  char *ptr = malloc(sizeof(char) * 301);
+  memcpy(ptr, *json_res + 17, 300);
+  ptr[300] = 0;
+
 
   return ptr;
 }

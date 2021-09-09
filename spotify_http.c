@@ -4,6 +4,7 @@
 #include "spotify_command_defines.h"
 #include "token.h"
 #include <curl/curl.h>
+#include <sys/types.h>
 
 /**
  * this function actually gets called multiple times, it gets called
@@ -18,7 +19,7 @@ size_t
 StoreData(char *contents, size_t size, size_t nmemb, void *user_struct) 
 {
   /* cast as our custom object */
-  struct json_data *json_res = (struct json_data *)user_struct;
+  struct spotify_json_data *json_res = (struct spotify_json_data *)user_struct;
 
   /* size of the packet */
   size_t realsize = size * nmemb;
@@ -49,24 +50,23 @@ StoreData(char *contents, size_t size, size_t nmemb, void *user_struct)
 }
 
 void 
-curl_setopt(CURL *curl, struct spotify_args *args, struct curl_slist *headers, char *req_type)
+curl_setopt(CURL *curl, struct scpotify_context *args, struct curl_slist *headers, char *req_type)
 {
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, req_type);
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-  printf("%s\n", args->endpoint);
   curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
 }
 
 void 
-spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, struct curl_slist *headers)
+spotify_http_perform(CURL *curl, struct scpotify_context *args, CURLcode res, struct curl_slist *headers)
 {
-  struct json_data web_data = {
+  struct spotify_json_data web_data = {
     .data               = NULL,
     .current_size       = 0,
     .allocated_max_size = 0
   };
 
-  if(args->http_get_write)
+  if(args->enable_write)
   {
     web_data.data = malloc(sizeof(char) * 16);
     web_data.current_size = 0;
@@ -82,16 +82,17 @@ spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, struct
 
       res = curl_easy_perform(curl);
 
-      args->search_struct->spotify_json_res = web_data.data;
+      args->search_struct->spotify_json_response = web_data.data;
       break;
     case POST:
       curl_setopt(curl, args, headers, "POST");
-      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, args->search_struct->jsonObj);
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, args->search_struct->spotify_json_data);
+
       res = curl_easy_perform(curl);
       break;
     case PUT:
       curl_setopt(curl, args, headers, "PUT");
-      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, args->search_struct->jsonObj);
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, args->search_struct->spotify_json_data);
       res = curl_easy_perform(curl);
       break;
     case DELETE:
@@ -102,17 +103,22 @@ spotify_http_perform(CURL *curl, struct spotify_args *args, CURLcode res, struct
   }
 }
 
-void 
-spotify_http(struct spotify_args *args) {
+long 
+spotify_http(struct scpotify_context *args) {
   CURL *curl;
   CURLcode res = 0;
   struct curl_slist *headers = NULL;
+  long http_code = 0;
+  char *append_header = "Authorization: Bearer ";
+
+  args->auth_struct->auth_token[300] = 0;
+  char *header = concat_strings(append_header, args->auth_struct->auth_token);
 
   headers = curl_slist_append(headers, "Accept: application/json");
   headers = curl_slist_append(headers, "Content-Type: application/json");
   headers = curl_slist_append(headers, "charset: utf-8");
+  headers = curl_slist_append(headers, header);
 
-  headers = curl_slist_append(headers, token);
   curl = curl_easy_init();
 
   if (curl) {
@@ -123,15 +129,66 @@ spotify_http(struct spotify_args *args) {
     if (CURLE_OK == res) {
       char *ct;
       res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct);
-    }
+      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+    } 
+  }
+
+  curl_easy_cleanup(curl);
+  curl_slist_free_all(headers);
+  free(header);
+
+  return http_code;
+}
+
+void 
+spotify_auth_http(struct scpotify_context *args) {
+  CURL *curl;
+  CURLcode res = 0;
+  struct curl_slist *headers = NULL;
+  long http_code = 0;
+
+  headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+  char *header = concat_strings("Authorization: Basic ", args->auth_struct->base64_client_secret + 14);
+  header[109] = 0;
+  headers = curl_slist_append(headers, header);
+
+  curl = curl_easy_init();
+
+  struct spotify_json_data web_data = {
+    .data               = NULL,
+    .current_size       = 0,
+    .allocated_max_size = 0
+  };
+
+  web_data.data = malloc(sizeof(char) * 16);
+  web_data.current_size = 0;
+  web_data.allocated_max_size = 16;
+
+  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+  curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, StoreData);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &web_data);
+
+  res = curl_easy_perform(curl);
+  args->search_struct->spotify_json_response = web_data.data;
+
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    
+
+    if (CURLE_OK == res) {
+      char *ct;
+      res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct);
+      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+    } 
   }
 
   curl_easy_cleanup(curl);
   curl_slist_free_all(headers);
 }
-
 char *
-build_search_query(struct spotify_args *args)
+build_search_query(struct scpotify_context *args)
 {
   char *endpoint = NULL;
 
@@ -159,11 +216,11 @@ char *
 build_put_request(char *album_info, char* album_position) 
 {
   /* we the offset needs to be set to the number minus 1 */
-  int pos = atoi(album_position);
+  int8_t pos = atoi(album_position);
   pos--;
  
   /* turn the int to a char again */
-  char offset[2];
+  char offset[5];
   sprintf(offset, "%d", pos);
 
   char *jsonObj;

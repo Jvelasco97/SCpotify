@@ -103,7 +103,7 @@ char *url_encoder(char *search, const int search_type) {
 
   /* the new encoded url */
 
-  char new_str[url_size];
+  char new_str[url_size + 10];
   new_str[url_size] = 0;
 
   build_url(new_str, search, url_size);

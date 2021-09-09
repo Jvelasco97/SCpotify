@@ -19,5 +19,6 @@ char *insert_parsed_data(char **, const char **, int, bool);
 char *insert_parsed_queue_data(char **, const char **, int);
 char *insert_parsed_playlist_info(char **, const char**, int, bool);
 char *insert_top_artist(char **, const char **);
+char *parse_auth_token(char **);
 
 #endif

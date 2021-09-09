@@ -3,7 +3,7 @@
 
 #include "spotify_structs.h"
 
-void process_args(int , char **, struct spotify_args *);
+void process_args(int , char **, struct scpotify_context *);
 void print_help();
 
 #endif

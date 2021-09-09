@@ -7,6 +7,11 @@ switch to the site and use my vim keybindings to change songs
 and such, I decided I also wanted a way to show what song  
 was playing in my polybar.  
 
+As of now, I have automatic token refresh albeit a bit wonky.  
+I have a config file and when a request is not a 200, then the token  
+get refreshed. I will be posting a guide here to to setup refresh tokens  
+as well as register an app if you habent done so before.  
+
 ![sample 1](samples/2021-07-15_18-34.png)
 ![sample 2](samples/2021-07-15_18-34_1.png)
 
@@ -57,7 +62,7 @@ you will then be asked what song you want to play.
 - [X] seek functionality (in ms for now)
 - [X] volume functionality
 - [X] previously played functionality
-- [X] add song to current player
+- [X] add song to current player  
 - [] get current context and prompt to play song from it
 
 ### Personalization
@@ -71,4 +76,4 @@ you will then be asked what song you want to play.
 - [ ] search album and play song
 
 ### OAUTH  
-- [ ] have the program handle OAUTH.
+- [X] have the program handle OAUTH.

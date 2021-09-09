@@ -36,26 +36,26 @@ void print_help() {
       "\nIssue are welcomed @ https://github.com/Jvelasco97/SCpotify\n");
 }
 
-void init_spotify_arg(struct spotify_args *args, char *endpoint, int command,
+void set_spotify_context(struct scpotify_context *args, char *endpoint, int command,
                       int http_type) {
   args->endpoint = endpoint;
-  args->search_struct->jsonObj = "{}";
+  args->search_struct->spotify_json_data = "{}";
   args->spotify_command = command;
   args->http_type = http_type;
 }
 
-void enable_json_write(struct spotify_args *args) {
-  args->http_get_write = true;
+void enable_write_context(struct scpotify_context *args) {
+  args->enable_write = true;
   args->search_struct->search_query = optarg;
 }
 
-static void change_player_status(struct spotify_args *args) {
+static void change_player_status(struct scpotify_context *args) {
   args->spotify_command = SPOTIFY_MODIFY_PLAYER;
-  args->search_struct->jsonObj = "{}";
+  args->search_struct->spotify_json_data = "{}";
   args->http_type = PUT;
 }
 
-void handle_case_zero(const char *option, struct spotify_args *args) {
+void handle_case_zero(const char *option, struct scpotify_context *args) {
   if (strcmp("repeat", option) == 0) 
   {
     if (strcmp("track", optarg) == 0) {
@@ -107,7 +107,7 @@ void handle_case_zero(const char *option, struct spotify_args *args) {
     args->endpoint = "https://api.spotify.com/v1/me/playlists?limit=30";
     args->spotify_command = SPOTIFY_PLAYLIST;
     args->http_type = GET;
-    args->http_get_write = true;
+    args->enable_write = true;
   } 
 
   else if (strcmp("now", option) == 0) 
@@ -124,7 +124,7 @@ void handle_case_zero(const char *option, struct spotify_args *args) {
     }
 
     args->http_type = GET;
-    args->http_get_write = true;
+    args->enable_write = true;
   } 
 
   else if (strcmp("top", option) == 0) 
@@ -132,7 +132,7 @@ void handle_case_zero(const char *option, struct spotify_args *args) {
     args->endpoint = "https://api.spotify.com/v1/me/top/tracks?limit=10";
     args->spotify_command = SPOTIFY_TOPS;
     args->http_type = GET;
-    args->http_get_write = true;
+    args->enable_write = true;
   }
 }
 /**
@@ -144,7 +144,7 @@ void handle_case_zero(const char *option, struct spotify_args *args) {
  * @param put_post - since the player api has a POST or PUT, i use a
  * boolean value to determine which one is being used
  */
-void process_args(int argc, char **argv, struct spotify_args *args) {
+void process_args(int argc, char **argv, struct scpotify_context *args) {
   int choice;
   int option_index = 0;
 
@@ -171,25 +171,25 @@ void process_args(int argc, char **argv, struct spotify_args *args) {
     /* pause player  -- PUT*/
     case 'p':
       printf("\nNow pausing\n");
-      init_spotify_arg(args, "https://api.spotify.com/v1/me/player/pause",
+      set_spotify_context(args, "https://api.spotify.com/v1/me/player/pause",
                        SPOTIFY_MODIFY_PLAYER, PUT);
       break;
     /* resume player -- PUT*/
     case 'r':
       printf("\nNow resuming\n");
-      init_spotify_arg(args, "https://api.spotify.com/v1/me/player/play",
+      set_spotify_context(args, "https://api.spotify.com/v1/me/player/play?device_id=b49a5780a99ea81284fc0746a78f84a30e4d5c73",
                        SPOTIFY_PLAY, PUT);
       break;
     /* next track -- POST*/
     case 'n':
       printf("\nPlaying next track\n");
-      init_spotify_arg(args, "https://api.spotify.com/v1/me/player/next",
+      set_spotify_context(args, "https://api.spotify.com/v1/me/player/next",
                        SPOTIFY_NEXT, POST);
       break;
     /* prev track -- POST*/
     case 'b':
       printf("\nPlaying previous track\n");
-      init_spotify_arg(args, "https://api.spotify.com/v1/me/player/previous",
+      set_spotify_context(args, "https://api.spotify.com/v1/me/player/previous",
                        SPOTIFY_PREVIOUS, POST);
       break;
     /* search track -- GET */
@@ -197,32 +197,32 @@ void process_args(int argc, char **argv, struct spotify_args *args) {
       printf("\nSearching for song...\n\n");
       args->endpoint = "https://api.spotify.com/v1/search?q=";
 
-      init_spotify_arg(
+      set_spotify_context(
           args, "https://api.spotify.com/v1/search?q=", SPOTIFY_SEARCH_SONGS, GET);
 
-      enable_json_write(args);
+      enable_write_context(args);
       args->search_struct->query_type = SONG_QUERY;
       break;
     case 'a':
       printf("\nSearching for artist...\n\n");
       args->endpoint = "https://api.spotify.com/v1/search?q=";
-      init_spotify_arg(args, "https://api.spotify.com/v1/search?q=", SPOTIFY_SEARCH_ARTISTS, GET);
-      enable_json_write(args);
+      set_spotify_context(args, "https://api.spotify.com/v1/search?q=", SPOTIFY_SEARCH_ARTISTS, GET);
+      enable_write_context(args);
       args->search_struct->query_type = ARTIST_QUERY;
       break;
     case 't':
       printf("\nfetching past songs...\n\n");
-      init_spotify_arg(args,
+      set_spotify_context(args,
                        "https://api.spotify.com/v1/me/player/recently-played",
                        SPOTIFY_HISTORY, GET);
-      args->http_get_write = true;
+      args->enable_write = true;
       break;
     case 'q':
       printf(
           "\nSearching for a song that you want to add to the player...\n\n");
-      init_spotify_arg(
+      set_spotify_context(
           args, "https://api.spotify.com/v1/search?q=", SPOTIFY_QUEUE, GET);
-      enable_json_write(args);
+      enable_write_context(args);
       args->search_struct->query_type = DEFAULT_QUERY;
       break;
     case 'h':
