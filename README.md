@@ -12,7 +12,7 @@ I have a config file and when a request is not a 200, then the token
 get refreshed. I will be posting a guide here to to setup refresh tokens  
 as well as register an app if you havent done so before.  
 
-`mkdir ~/.config/scpotify`
+`mkdir ~/.config/scpotify`  
 `touch ~/.config/scpotify/config.ini`
 
 This is what I have in the file. 
