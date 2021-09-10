@@ -186,7 +186,9 @@ spotify_auth_http(struct scpotify_context *args) {
 
   curl_easy_cleanup(curl);
   curl_slist_free_all(headers);
+  free(header);
 }
+
 char *
 build_search_query(struct scpotify_context *args)
 {
