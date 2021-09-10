@@ -10,7 +10,21 @@ was playing in my polybar.
 As of now, I have automatic token refresh albeit a bit wonky.  
 I have a config file and when a request is not a 200, then the token  
 get refreshed. I will be posting a guide here to to setup refresh tokens  
-as well as register an app if you habent done so before.  
+as well as register an app if you havent done so before.  
+
+`mkdir ~/.config/scpotify`
+`touch ~/.config/scpotify/config.ini`
+
+This is what I have in the file. 
+I will add auto creation later.
+
+```
+CLIENT_SECRET=ZmU...zc=
+REFRESH_TOKEN=AQ...M
+token_placeholder
+```
+
+after the program is ran the first time, it will hold the 300 character token.
 
 ![sample 1](samples/2021-07-15_18-34.png)
 ![sample 2](samples/2021-07-15_18-34_1.png)
@@ -63,7 +77,7 @@ you will then be asked what song you want to play.
 - [X] volume functionality
 - [X] previously played functionality
 - [X] add song to current player  
-- [] get current context and prompt to play song from it
+- [ ] get current context and prompt to play song from it
 
 ### Personalization
 - [X] display top artists and songs
@@ -74,6 +88,14 @@ you will then be asked what song you want to play.
 
 ### Albums
 - [ ] search album and play song
+
+### Podcasts  
+- [ ] search and play podcast episodes  
+
+### Playlists  
+- [ ] look for specific playlists and add(follow) them to own library
+- [ ] remove unwated playlists  
+- [ ] be able to add current playing song to playlist  
 
 ### OAUTH  
 - [X] have the program handle OAUTH.

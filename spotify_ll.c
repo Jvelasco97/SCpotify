@@ -22,6 +22,23 @@ spotify_top_artists *spotify_top_artist_head = NULL;
 static struct 
 spotify_related_artists *spotify_related_artists_head = NULL;
 
+int get_user_choice(int counter)
+{
+  int choice; 
+  printf("\nPlay which song? ");
+
+  while(true)
+  {
+    scanf("%d", &choice);
+    if(!(choice > -1 && choice < counter )) {
+      printf("\nplease enter the a valid range: ");
+    } else
+      break;
+  }
+
+  return choice;
+}
+
  /*
  * insert the node, its a linked list, but if you dont know,
  * when we create a new node, we want the head pointer to point to it
@@ -343,20 +360,9 @@ u_int8_t print_playlist_songs() {
   }
 
   /* ask what song we want to play*/
-  int choice;
+  int choice = get_user_choice(counter);
 
-  printf("\nPlay which song? ");
-
-  while(true)
-  {
-    scanf("%d", &choice);
-    if(!(choice > -1 && choice < counter )) {
-      printf("\nplease enter the a valid range: ");
-    } else
-      break;
-  }
-
-   return choice;
+  return choice;
 }
 /**
  * prints all the nodes strings, has the parantheses wrapping

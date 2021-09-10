@@ -6,6 +6,8 @@
 #include <curl/curl.h>
 #include <sys/types.h>
 
+#define AUTH_TOKEN_LENGHT 300
+
 /**
  * this function actually gets called multiple times, it gets called
  * as many times as there are still packets to be received. 
@@ -111,7 +113,7 @@ spotify_http(struct scpotify_context *args) {
   long http_code = 0;
   char *append_header = "Authorization: Bearer ";
 
-  args->auth_struct->auth_token[300] = 0;
+  args->auth_struct->auth_token[AUTH_TOKEN_LENGHT] = 0;
   char *header = concat_strings(append_header, args->auth_struct->auth_token);
 
   headers = curl_slist_append(headers, "Accept: application/json");
@@ -232,7 +234,8 @@ build_put_request(char *album_info, char* album_position)
   char *json_obj_end = "},\"position_ms\":0}";
 
   /* malloc sufficient space for the data so we can append all the values */
-  if ((jsonObj = malloc(strlen(json_obj_start) + strlen(album_info) + strlen(json_obj_mid) + 1 + strlen(json_obj_end) + 1)) != NULL) 
+  if ((jsonObj = malloc(strlen(json_obj_start) + strlen(album_info) + 
+          strlen(json_obj_mid) + 1 + strlen(json_obj_end) + 1)) != NULL) 
   {
     jsonObj[0] = '\0';
 
@@ -263,7 +266,8 @@ build_put_request_playlist(char *playlist_uri, int album_position)
   char *json_obj_end = "},\"position_ms\":0}";
 
   /* malloc sufficient space for the data so we can append all the values */
-  if ((jsonObj = malloc(strlen(json_obj_start) + strlen(playlist_uri) + strlen(json_obj_mid) + strlen(offset) + strlen(json_obj_end) + 1)) != NULL) 
+  if ((jsonObj = malloc(strlen(json_obj_start) + strlen(playlist_uri) + 
+          strlen(json_obj_mid) + strlen(offset) + strlen(json_obj_end) + 1)) != NULL) 
   {
     jsonObj[0] = '\0';
 

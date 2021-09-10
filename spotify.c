@@ -12,18 +12,12 @@ int main(int argc, char **argv) {
   scpotify_context *cmd_args = (scpotify_context*) malloc(sizeof(scpotify_context));
   spotify_search_context *search = (spotify_search_context*) malloc(sizeof(spotify_search_context));
   spotify_auth_payload *auth = (spotify_auth_payload*) malloc(sizeof(spotify_auth_payload));
-
-  spotify_song_query_info req = {
-    .track_info = NULL,
-    .track_position = NULL
-  };
-
-  init_cmd_args(cmd_args, search);
-
-  get_config_values(auth);
+  spotify_song_query_info req = { .track_info = NULL, .track_position = NULL };
 
   cmd_args->search_struct = search;
   cmd_args->auth_struct = auth;
+
+  init_cmd_args(cmd_args);
 
   /* process the command line options */
   if(argc > 1)
