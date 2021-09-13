@@ -2,7 +2,6 @@
 #include "spotify_structs.h"
 #include "spotify_utils.h"
 #include "spotify_command_defines.h"
-#include "token.h"
 #include <curl/curl.h>
 #include <sys/types.h>
 
