@@ -12,5 +12,5 @@ void spotify_auth_http(scpotify_context *);
 char *build_search_query(scpotify_context *);
 char *build_put_request(char *album_info, char* album_position);
 char *build_put_request_playlist(char *, int);
-
+char *build_put_request_episode(char *, char *,int);
 #endif

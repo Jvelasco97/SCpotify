@@ -281,3 +281,39 @@ build_put_request_playlist(char *playlist_uri, int album_position)
 
   return jsonObj;
 }
+
+char * 
+build_put_request_episode(char *show_uri, char *number_of_episodes,int show_position) 
+{
+  /* we the offset needs to be set to the number minus 1 */
+ 
+  char *jsonObj;
+  int num = atoi(number_of_episodes);
+  num--;
+
+  show_position = num - show_position;
+
+  char offset[3];
+  sprintf(offset, "%d", show_position);
+
+  char *json_obj_start = "{\"context_uri\":\"spotify:show:";
+  char *json_obj_mid = "\",\"offset\":{\"position\":";
+  char *json_obj_end = "},\"position_ms\":0}";
+
+  /* malloc sufficient space for the data so we can append all the values */
+  if ((jsonObj = malloc(strlen(json_obj_start) + strlen(show_uri) + 
+          strlen(json_obj_mid) + strlen(offset) + strlen(json_obj_end) + 1)) != NULL) 
+  {
+    jsonObj[0] = '\0';
+
+    strcat(jsonObj, json_obj_start);
+    strcat(jsonObj, show_uri);
+    strcat(jsonObj, json_obj_mid);
+    strcat(jsonObj, offset);
+    strcat(jsonObj, json_obj_end);
+  } else {
+    printf("malloc failed!\n");
+  }
+
+  return jsonObj;
+}

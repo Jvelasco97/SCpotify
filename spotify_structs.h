@@ -82,12 +82,48 @@ typedef struct spotify_song_search_node
   struct spotify_song_search_node *next;
 } spotify_song_search_node;
 
+typedef struct spotify_album_search_node
+{
+  char *album_id;
+  char *album_name;
+
+  struct spotify_album_search_node *next;
+} spotify_album_search_node;
+
+typedef struct spotify_podcast_search_node
+{
+  char *description;
+  char *podcast_id; 
+  char *name;
+  char *publisher;
+  char *number_of_episodes;
+
+  struct spotify_podcast_search_node *next;
+} spotify_podcast_search_node;
+
+typedef struct spotify_podcast_episode_node
+{
+  char *description;
+  char *duration_ms;
+  char *episode_id; 
+  char *name;
+  char *release_date;
+
+  struct spotify_podcast_episode_node *next;
+} spotify_podcast_episode_node;
+
 /* holds info about the parsed json that we want to play the track for */
 typedef struct spotify_song_query_info 
 {
   char *track_info;
   char *track_position;
 } spotify_song_query_info;
+
+typedef struct spotify_episode_query_info 
+{
+  char *podcast_id;
+  char *number_of_episodes;
+} spotify_episode_query_info;
 
 typedef struct spotify_top_tracks
 {
@@ -118,5 +154,14 @@ typedef struct spotify_auth_payload
   char *refresh_token;
   char *auth_token;
 } spotify_auth_payload;
+
+typedef struct spotify_artists_search_node
+{
+  char *genre_array;
+  char *artist_name;
+  char *artists_id;
+
+  struct spotify_artists_search_node *spotify_artists_search_node;
+} spotify_artists_search_node; 
 
 #endif

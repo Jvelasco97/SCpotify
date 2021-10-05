@@ -94,7 +94,7 @@ you will then be asked what song you want to play.
 
 ### Playlists  
 - [ ] look for specific playlists and add(follow) them to own library
-- [ ] remove unwated playlists  
+- [ ] remove unwanted playlists  
 - [ ] be able to add current playing song to playlist  
 
 ### OAUTH  

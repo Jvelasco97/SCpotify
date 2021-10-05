@@ -1,0 +1,714 @@
+{
+  "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1/albums?offset=0&limit=20&include_groups=single&market=US",
+  "items": [
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/00OQIrRjQgZmacSnjK8L7M"
+      },
+      "href": "https://api.spotify.com/v1/albums/00OQIrRjQgZmacSnjK8L7M",
+      "id": "00OQIrRjQgZmacSnjK8L7M",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b273ba00e990d1520a4cde41ce0c",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e02ba00e990d1520a4cde41ce0c",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d00004851ba00e990d1520a4cde41ce0c",
+          "width": 64
+        }
+      ],
+      "name": "Protect The Land / Genocidal Humanoidz",
+      "release_date": "2020-11-06",
+      "release_date_precision": "day",
+      "total_tracks": 2,
+      "type": "album",
+      "uri": "spotify:album:00OQIrRjQgZmacSnjK8L7M"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/6pFQHBA7XLkKtGKTlcDbpe"
+      },
+      "href": "https://api.spotify.com/v1/albums/6pFQHBA7XLkKtGKTlcDbpe",
+      "id": "6pFQHBA7XLkKtGKTlcDbpe",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b273a4070fc1d9938623d6368c3f",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e02a4070fc1d9938623d6368c3f",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d00004851a4070fc1d9938623d6368c3f",
+          "width": 64
+        }
+      ],
+      "name": "Hypnotize",
+      "release_date": "2005-11-12",
+      "release_date_precision": "day",
+      "total_tracks": 2,
+      "type": "album",
+      "uri": "spotify:album:6pFQHBA7XLkKtGKTlcDbpe"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/0g7rLswEejduKye2DF7EfI"
+      },
+      "href": "https://api.spotify.com/v1/albums/0g7rLswEejduKye2DF7EfI",
+      "id": "0g7rLswEejduKye2DF7EfI",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b273353f5624c79de33285f3d006",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e02353f5624c79de33285f3d006",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d00004851353f5624c79de33285f3d006",
+          "width": 64
+        }
+      ],
+      "name": "Hypnotize",
+      "release_date": "2005-10-11",
+      "release_date_precision": "day",
+      "total_tracks": 1,
+      "type": "album",
+      "uri": "spotify:album:0g7rLswEejduKye2DF7EfI"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/34ZNizx7MgcKWtlj8FTbJO"
+      },
+      "href": "https://api.spotify.com/v1/albums/34ZNizx7MgcKWtlj8FTbJO",
+      "id": "34ZNizx7MgcKWtlj8FTbJO",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b27398429f352e43516e63950a60",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e0298429f352e43516e63950a60",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d0000485198429f352e43516e63950a60",
+          "width": 64
+        }
+      ],
+      "name": "B.Y.O.B. single (with bonus)",
+      "release_date": "2005-05-03",
+      "release_date_precision": "day",
+      "total_tracks": 2,
+      "type": "album",
+      "uri": "spotify:album:34ZNizx7MgcKWtlj8FTbJO"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/12yjks2nFjudHRk7cE2uRw"
+      },
+      "href": "https://api.spotify.com/v1/albums/12yjks2nFjudHRk7cE2uRw",
+      "id": "12yjks2nFjudHRk7cE2uRw",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b273491ac37d20304699e8d66979",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e02491ac37d20304699e8d66979",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d00004851491ac37d20304699e8d66979",
+          "width": 64
+        }
+      ],
+      "name": "B.Y.O.B. single (with bonus)",
+      "release_date": "2005-03-29",
+      "release_date_precision": "day",
+      "total_tracks": 2,
+      "type": "album",
+      "uri": "spotify:album:12yjks2nFjudHRk7cE2uRw"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/4dE7p4ZMRkx3yOjDWILwl8"
+      },
+      "href": "https://api.spotify.com/v1/albums/4dE7p4ZMRkx3yOjDWILwl8",
+      "id": "4dE7p4ZMRkx3yOjDWILwl8",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b27396ad8ea3886c8f3dbcc7fed9",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e0296ad8ea3886c8f3dbcc7fed9",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d0000485196ad8ea3886c8f3dbcc7fed9",
+          "width": 64
+        }
+      ],
+      "name": "B.Y.O.B.",
+      "release_date": "2005-03-29",
+      "release_date_precision": "day",
+      "total_tracks": 1,
+      "type": "album",
+      "uri": "spotify:album:4dE7p4ZMRkx3yOjDWILwl8"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/0q2dTfsJzyEn3uZ3J3EZaU"
+      },
+      "href": "https://api.spotify.com/v1/albums/0q2dTfsJzyEn3uZ3J3EZaU",
+      "id": "0q2dTfsJzyEn3uZ3J3EZaU",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b273898d6a2fe897e7071240342d",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e02898d6a2fe897e7071240342d",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d00004851898d6a2fe897e7071240342d",
+          "width": 64
+        }
+      ],
+      "name": "B.Y.O.B.",
+      "release_date": "2005-03-29",
+      "release_date_precision": "day",
+      "total_tracks": 1,
+      "type": "album",
+      "uri": "spotify:album:0q2dTfsJzyEn3uZ3J3EZaU"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/41CBKm6FPUh28WPFj6UtNT"
+      },
+      "href": "https://api.spotify.com/v1/albums/41CBKm6FPUh28WPFj6UtNT",
+      "id": "41CBKm6FPUh28WPFj6UtNT",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b2736ef784594c984b3cc84ace75",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e026ef784594c984b3cc84ace75",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d000048516ef784594c984b3cc84ace75",
+          "width": 64
+        }
+      ],
+      "name": "Lonely Day",
+      "release_date": "2005-01-01",
+      "release_date_precision": "day",
+      "total_tracks": 1,
+      "type": "album",
+      "uri": "spotify:album:41CBKm6FPUh28WPFj6UtNT"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/6Q3tjZAxZol0881RRWEBTP"
+      },
+      "href": "https://api.spotify.com/v1/albums/6Q3tjZAxZol0881RRWEBTP",
+      "id": "6Q3tjZAxZol0881RRWEBTP",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b273333dca7cd07a0fd59eebe0e8",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e02333dca7cd07a0fd59eebe0e8",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d00004851333dca7cd07a0fd59eebe0e8",
+          "width": 64
+        }
+      ],
+      "name": "Aerials",
+      "release_date": "2002-07-22",
+      "release_date_precision": "day",
+      "total_tracks": 2,
+      "type": "album",
+      "uri": "spotify:album:6Q3tjZAxZol0881RRWEBTP"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/22HjHHa30iVPm3rhcsVzhp"
+      },
+      "href": "https://api.spotify.com/v1/albums/22HjHHa30iVPm3rhcsVzhp",
+      "id": "22HjHHa30iVPm3rhcsVzhp",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b2737168f7e33c3efc6b1d14552a",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e027168f7e33c3efc6b1d14552a",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d000048517168f7e33c3efc6b1d14552a",
+          "width": 64
+        }
+      ],
+      "name": "Toxicity",
+      "release_date": "2002-03-11",
+      "release_date_precision": "day",
+      "total_tracks": 2,
+      "type": "album",
+      "uri": "spotify:album:22HjHHa30iVPm3rhcsVzhp"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/2KdBdRHbvtla2qtgYOT2Td"
+      },
+      "href": "https://api.spotify.com/v1/albums/2KdBdRHbvtla2qtgYOT2Td",
+      "id": "2KdBdRHbvtla2qtgYOT2Td",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b273277692f53f0b8b2bd646af65",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e02277692f53f0b8b2bd646af65",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d00004851277692f53f0b8b2bd646af65",
+          "width": 64
+        }
+      ],
+      "name": "Chop Suey!",
+      "release_date": "2001-10-29",
+      "release_date_precision": "day",
+      "total_tracks": 2,
+      "type": "album",
+      "uri": "spotify:album:2KdBdRHbvtla2qtgYOT2Td"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/4PRYj7Apw5PmfcIeY4Zkf7"
+      },
+      "href": "https://api.spotify.com/v1/albums/4PRYj7Apw5PmfcIeY4Zkf7",
+      "id": "4PRYj7Apw5PmfcIeY4Zkf7",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b273ac57464cedcc7488d9281fce",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e02ac57464cedcc7488d9281fce",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d00004851ac57464cedcc7488d9281fce",
+          "width": 64
+        }
+      ],
+      "name": "Chop Suey!",
+      "release_date": "2001-10-04",
+      "release_date_precision": "day",
+      "total_tracks": 4,
+      "type": "album",
+      "uri": "spotify:album:4PRYj7Apw5PmfcIeY4Zkf7"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/1EVHVrqfm8Idv4zb8ZLzY6"
+      },
+      "href": "https://api.spotify.com/v1/albums/1EVHVrqfm8Idv4zb8ZLzY6",
+      "id": "1EVHVrqfm8Idv4zb8ZLzY6",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b273ec23aeb86e5f83affbdb8f32",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e02ec23aeb86e5f83affbdb8f32",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d00004851ec23aeb86e5f83affbdb8f32",
+          "width": 64
+        }
+      ],
+      "name": "Lonely Day",
+      "release_date": "2000",
+      "release_date_precision": "year",
+      "total_tracks": 2,
+      "type": "album",
+      "uri": "spotify:album:1EVHVrqfm8Idv4zb8ZLzY6"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/6eHooNFxb0HVRmdWX3rCoZ"
+      },
+      "href": "https://api.spotify.com/v1/albums/6eHooNFxb0HVRmdWX3rCoZ",
+      "id": "6eHooNFxb0HVRmdWX3rCoZ",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b27356ca82b0ad2e288fd6db7b8b",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e0256ca82b0ad2e288fd6db7b8b",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d0000485156ca82b0ad2e288fd6db7b8b",
+          "width": 64
+        }
+      ],
+      "name": "Toxicity",
+      "release_date": "1999",
+      "release_date_precision": "year",
+      "total_tracks": 3,
+      "type": "album",
+      "uri": "spotify:album:6eHooNFxb0HVRmdWX3rCoZ"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/6T2FD996HGKJ00rpuHHbu7"
+      },
+      "href": "https://api.spotify.com/v1/albums/6T2FD996HGKJ00rpuHHbu7",
+      "id": "6T2FD996HGKJ00rpuHHbu7",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b273c54b9260b13a275c546fb534",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e02c54b9260b13a275c546fb534",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d00004851c54b9260b13a275c546fb534",
+          "width": 64
+        }
+      ],
+      "name": "Vicinity Of Obscenity/Lonely Day",
+      "release_date": "1999",
+      "release_date_precision": "year",
+      "total_tracks": 5,
+      "type": "album",
+      "uri": "spotify:album:6T2FD996HGKJ00rpuHHbu7"
+    },
+    {
+      "album_group": "single",
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5eAWCfyUhZtHHtBdNk56l1"
+          },
+          "href": "https://api.spotify.com/v1/artists/5eAWCfyUhZtHHtBdNk56l1",
+          "id": "5eAWCfyUhZtHHtBdNk56l1",
+          "name": "System Of A Down",
+          "type": "artist",
+          "uri": "spotify:artist:5eAWCfyUhZtHHtBdNk56l1"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/6rDpgWoxpfltcSxXK9JQqN"
+      },
+      "href": "https://api.spotify.com/v1/albums/6rDpgWoxpfltcSxXK9JQqN",
+      "id": "6rDpgWoxpfltcSxXK9JQqN",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b2732d98d071328230fa1d40b3ed",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e022d98d071328230fa1d40b3ed",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d000048512d98d071328230fa1d40b3ed",
+          "width": 64
+        }
+      ],
+      "name": "Chop Suey!",
+      "release_date": "1999",
+      "release_date_precision": "year",
+      "total_tracks": 3,
+      "type": "album",
+      "uri": "spotify:album:6rDpgWoxpfltcSxXK9JQqN"
+    }
+  ],
+  "limit": 20,
+  "next": null,
+  "offset": 0,
+  "previous": null,
+  "total": 16
+}

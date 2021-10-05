@@ -5,6 +5,7 @@
  * @brief gets current playing song on spotify, more stuff soon, prob....
  */
 #include "main_includes.h"
+#include <stdio.h>
 
 int main(int argc, char **argv) {
 

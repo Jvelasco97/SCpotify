@@ -112,6 +112,8 @@ char *url_encoder(char *search, const int search_type) {
     strcat(new_str, "&type=track&limit=5");
   if(search_type == ARTIST_QUERY)
     strcat(new_str, "&type=artist&limit=5");
+  if(search_type == PODCAST_QUERY)
+    strcat(new_str, "&type=show&limit=5");
 
   char *encoded_url = perform_memcopy(new_str);
 

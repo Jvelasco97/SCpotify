@@ -8,19 +8,31 @@ static struct
 spotify_song_search_node *available_song_search_head = NULL;
 
 static struct 
+spotify_album_search_node *available_head_album_search_head = NULL;
+
+static struct
 spotify_playlist_context *available_playlist_head = NULL;
 
-static struct 
+static struct
 spotify_playlist_songs *available_playlist_song_head = NULL;
 
-static struct 
+static struct
 spotify_top_tracks *spotify_top_track_head = NULL;
 
-static struct 
+static struct
 spotify_top_artists *spotify_top_artist_head = NULL;
 
-static struct 
+static struct
 spotify_related_artists *spotify_related_artists_head = NULL;
+
+static struct
+spotify_artists_search_node *spotify_artists_search_node_head = NULL;
+
+static struct
+spotify_podcast_search_node *spotify_podcast_search_node_head = NULL;
+
+static struct
+spotify_podcast_episode_node *spotify_podcast_episode_search_node_head = NULL;
 
 int get_user_choice(int counter)
 {
@@ -156,6 +168,46 @@ insert_top_artist_node(struct spotify_top_artists *node)
   spotify_top_artist_head = node;
 }
 
+void 
+insert_artist_search_node(struct spotify_artists_search_node *node)
+{
+  /* point to previous head */
+  node->spotify_artists_search_node = spotify_artists_search_node_head;
+
+  /* new head */
+  spotify_artists_search_node_head = node;
+}
+
+void 
+insert_album_search_node(struct spotify_album_search_node *node)
+{
+  /* point to previous head */
+  node->next = available_head_album_search_head;
+
+  /* new head */
+  available_head_album_search_head = node;
+}
+
+void 
+insert_show_search_node(struct spotify_podcast_search_node *node)
+{
+  /* point to previous head */
+  node->next = spotify_podcast_search_node_head;
+
+  /* new head */
+  spotify_podcast_search_node_head = node;
+}
+
+void 
+insert_episode_search_node(spotify_podcast_episode_node *node)
+{
+  /* point to previous head */
+  node->next = spotify_podcast_episode_search_node_head;
+
+  /* new head */
+  spotify_podcast_episode_search_node_head = node;
+}
+
 /**
  * prints all the nodes strings, has the parantheses wrapping
  * around them
@@ -216,6 +268,76 @@ void print_related_artists() {
     printf("[%s]\n\n",ptr->genre_array);
     ptr = ptr->spotify_related_artists_node;
   }
+}
+
+struct spotify_episode_query_info
+print_show_search_results(struct spotify_episode_query_info episode_info) {
+  struct spotify_podcast_search_node *ptr = spotify_podcast_search_node_head;
+
+  u_int8_t counter = 0;
+
+  while(ptr != NULL) 
+  {
+    printf("%s[%d]%s Podcast name: %s\n","\x1B[36m",counter++,"\x1B[0m",ptr->name);
+    printf("\nNumber of episodes: %s\n",ptr->number_of_episodes);
+    printf("\nPublisher: %s\n",ptr->publisher);
+    printf("\nDescription: %s\n\n",ptr->description);
+    ptr = ptr->next;
+  }
+
+  ptr = spotify_podcast_search_node_head;
+
+  u_int8_t choice = get_user_choice(counter);
+  counter = 0;
+
+  while(ptr != NULL) 
+  {
+
+    if(counter == choice)
+    {
+      episode_info.number_of_episodes = ptr->number_of_episodes;
+      episode_info.podcast_id = ptr->podcast_id;
+      break;
+    }
+    ptr = ptr->next;
+    counter++;
+  }
+
+  return episode_info;
+}
+
+/**
+ * prints all the nodes strings, has the parantheses wrapping
+ * around them
+ */
+char *print_searched_artists() {
+  struct spotify_artists_search_node *ptr = spotify_artists_search_node_head;
+
+  u_int8_t counter = 0;
+
+  while(ptr != NULL) 
+  {
+    printf("[%d] %s\n",counter++,ptr->artist_name);
+    printf("[%s]\n\n",ptr->genre_array);
+    ptr = ptr->spotify_artists_search_node;
+  }
+
+  ptr = spotify_artists_search_node_head;
+  u_int8_t choice = get_user_choice(counter);
+  counter = 0;
+
+  while(ptr != NULL) 
+  {
+
+    if(counter == choice)
+    {
+      return ptr->artists_id;
+    }
+    ptr = ptr->spotify_artists_search_node;
+    counter++;
+  }
+
+  return NULL;
 }
 
 /**
@@ -334,6 +456,28 @@ reverse_top_artists(struct spotify_top_artists** spotify_top_artist_head)
   *spotify_top_artist_head = prev;
 }
 
+void 
+reverse_podcast_episodes(struct spotify_podcast_episode_node** spotify_podcast_episode_node_head)
+{
+  spotify_podcast_episode_node *prev = NULL;
+  spotify_podcast_episode_node *current = *spotify_podcast_episode_node_head;
+  spotify_podcast_episode_node* next = NULL;
+
+  while (current != NULL) 
+  {
+    /* Store next */
+    next = current->next;
+
+    /* Reverse current node's pointer */
+    current->next = prev;
+
+    /* Move pointers one position ahead. */
+    prev = current;
+    current = next;
+  }
+
+  *spotify_podcast_episode_node_head = prev;
+}
 /**
  * prints all the nodes strings, has the parantheses wrapping
  * around them
@@ -411,6 +555,40 @@ char *print_playlist() {
    return NULL;
 }
 
+u_int16_t
+print_podcast_episodes() {
+  struct spotify_podcast_episode_node *ptr = spotify_podcast_episode_search_node_head; 
+
+  reverse_podcast_episodes(&ptr);
+
+  u_int8_t counter = 0;
+
+  while(ptr != NULL) {
+    printf("%s[%d]%s Episode title: %s\n\n Release date: %s\n\n Description: %s\n\n",
+	  "\x1B[36m",counter++,"\x1B[0m",
+	  ptr->name,
+	  ptr->release_date,
+	  ptr->description);
+    ptr = ptr->next;
+  }
+
+  /* ask what song we want to play*/
+  int choice;
+
+  printf("\nWhich episode would you like to listen to? ");
+
+  while(true)
+  {
+    scanf("%d", &choice);
+    if(!(choice > -1 && choice < counter )) {
+      printf("\nplease enter the a valid range: ");
+    } else
+      break;
+  }
+
+  return choice;
+}
+
 /**
  * prints all the available songs and then asks the user what
  * song to play based on index
@@ -470,6 +648,74 @@ print_avaible_songs(u_int8_t MAX_SEARCH)
 
     counter++;
     ptr = ptr->next;
+  }
+
+  return req_node;
+}
+
+spotify_song_query_info 
+print_searched_artist_results(u_int8_t MAX_SEARCH) 
+{
+  spotify_song_search_node *song_ptr = available_song_search_head;
+  spotify_album_search_node *album_ptr = available_head_album_search_head;
+
+  /* used to point to the node that we want album info from */
+  u_int8_t counter = 0;
+
+  /* params for play_song */
+  /* char *album_id; */
+  /* char *album_position; */
+
+  spotify_song_query_info req_node = {
+    .track_info = NULL,
+    .track_position = NULL
+  };
+
+  printf("\nHere are the top tracks for this artist!\n");
+  /* display available songs */
+  while(song_ptr != NULL) {
+    printf("%s[%d]%s %s%s%s (%s%s%s) by %s%s%s\n",
+	   "\x1B[36m",counter++,"\x1B[0m",
+	   "\x1B[31m",song_ptr->song_title,"\x1B[0m",
+	   "\x1B[34m",song_ptr->album_name,"\x1B[0m",
+	   "\x1B[33m",song_ptr->artist_info,"\x1B[0m");
+    song_ptr = song_ptr->next;
+  }
+
+  printf("\nHere are albums associated with this artist!\n");
+
+  while(album_ptr != NULL) {
+    printf("%s%s%s\n",
+	   "\x1B[31m",album_ptr->album_name,"\x1B[0m");
+    album_ptr = album_ptr->next;
+  }
+
+  /* reset so we can fetch the index position */
+  song_ptr = available_song_search_head;
+  counter = 0;
+  
+  /* ask what song we want to play*/
+  int choice;
+  printf("\nPlay which song? ");
+
+  while(true)
+  {
+    scanf("%d", &choice);
+    if(!(choice > -1 && choice < MAX_SEARCH )) {
+      printf("\nplease enter the a valid range: ");
+    } else
+      break;
+  }
+
+  while(song_ptr) {
+    if(counter == choice) {
+      req_node.track_info = song_ptr->album_api_info;
+      req_node.track_position = song_ptr->album_position;
+      break;
+    }
+
+    counter++;
+    song_ptr = song_ptr->next;
   }
 
   return req_node;

@@ -1,0 +1,9 @@
+* Search By Artist
+  -> use artist id to get albums, top songs will also be displayed but  
+     will be used to prompt user.
+  -> cleanup.
+** implementation
+   - [X] make http call to top tracks, parse, and stores results in list
+   - [X] make http call to albums, parse, and store the results
+   - [X] print results, only display the albums, have prompt for top songs.
+   - [X] reset context for to play the song later.

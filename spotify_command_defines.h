@@ -13,6 +13,7 @@
 #define SPOTIFY_TOPS              9
 #define SPOTIFY_RELATED_ARTISTS   10
 #define SPOTIFY_SEARCH_ARTISTS    11
+#define SPOTIFY_SEARCH_PODCASTS   12
 
 #define GET    0
 #define POST   1
@@ -23,5 +24,6 @@
 #define SONG_QUERY    1 
 #define ARTIST_QUERY  2
 #define ALBUM_QUERY   3
+#define PODCAST_QUERY 4
 
 #endif
