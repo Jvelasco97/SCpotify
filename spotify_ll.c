@@ -34,7 +34,11 @@ spotify_podcast_search_node *spotify_podcast_search_node_head = NULL;
 static struct
 spotify_podcast_episode_node *spotify_podcast_episode_search_node_head = NULL;
 
-int get_user_choice(int counter)
+static struct
+spotify_device_list_node *spotify_device_list_node_head = NULL;
+
+int
+get_user_choice(int counter)
 {
   int choice; 
   printf("\nPlay which song? ");
@@ -63,7 +67,7 @@ int get_user_choice(int counter)
 void 
 insert_node(char* song_info, ssize_t size) 
 {
-  struct song_info_node *node = (struct song_info_node*) malloc(sizeof(struct song_info_node));
+  song_info_node *node = (struct song_info_node*) malloc(sizeof(struct song_info_node));
 
   char *dest = malloc(sizeof(char) * size);
 
@@ -88,7 +92,7 @@ insert_node(char* song_info, ssize_t size)
  * @param song_info - song title for display purposes
  */
 void 
-insert_search_node(struct spotify_song_search_node *node) 
+insert_search_node(spotify_song_search_node *node) 
 {
   /* point to previous head */
   node->next = available_song_search_head;
@@ -105,7 +109,7 @@ insert_search_node(struct spotify_song_search_node *node)
  * @param song_info - song title for display purposes
  */
 void 
-insert_playlist_node(struct spotify_playlist_context *node) 
+insert_playlist_node(spotify_playlist_context *node) 
 {
   /* point to previous head */
   node->next = available_playlist_head;
@@ -122,7 +126,7 @@ insert_playlist_node(struct spotify_playlist_context *node)
  * @param song_info - song title for display purposes
  */
 void 
-insert_playlist_song_node(struct spotify_playlist_songs *node) 
+insert_playlist_song_node(spotify_playlist_songs *node) 
 {
   /* point to previous head */
   node->next = available_playlist_song_head;
@@ -132,7 +136,7 @@ insert_playlist_song_node(struct spotify_playlist_songs *node)
 }
 
 void 
-insert_related_artist_node(struct spotify_related_artists *node) 
+insert_related_artist_node(spotify_related_artists *node) 
 {
   /* point to previous head */
   node->spotify_related_artists_node = spotify_related_artists_head;
@@ -149,7 +153,7 @@ insert_related_artist_node(struct spotify_related_artists *node)
  * @param song_info - song title for display purposes
  */
 void 
-insert_top_track_node(struct spotify_top_tracks *node) 
+insert_top_track_node(spotify_top_tracks *node) 
 {
   /* point to previous head */
   node->next_spotify_top_tracks = spotify_top_track_head;
@@ -158,8 +162,17 @@ insert_top_track_node(struct spotify_top_tracks *node)
   spotify_top_track_head = node;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
-insert_top_artist_node(struct spotify_top_artists *node) 
+insert_top_artist_node(spotify_top_artists *node) 
 {
   /* point to previous head */
   node->next_spotify_top_artists = spotify_top_artist_head;
@@ -168,8 +181,17 @@ insert_top_artist_node(struct spotify_top_artists *node)
   spotify_top_artist_head = node;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
-insert_artist_search_node(struct spotify_artists_search_node *node)
+insert_artist_search_node(spotify_artists_search_node *node)
 {
   /* point to previous head */
   node->spotify_artists_search_node = spotify_artists_search_node_head;
@@ -178,8 +200,17 @@ insert_artist_search_node(struct spotify_artists_search_node *node)
   spotify_artists_search_node_head = node;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
-insert_album_search_node(struct spotify_album_search_node *node)
+insert_album_search_node(spotify_album_search_node *node)
 {
   /* point to previous head */
   node->next = available_head_album_search_head;
@@ -188,6 +219,15 @@ insert_album_search_node(struct spotify_album_search_node *node)
   available_head_album_search_head = node;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
 insert_show_search_node(struct spotify_podcast_search_node *node)
 {
@@ -198,6 +238,15 @@ insert_show_search_node(struct spotify_podcast_search_node *node)
   spotify_podcast_search_node_head = node;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
 insert_episode_search_node(spotify_podcast_episode_node *node)
 {
@@ -209,10 +258,31 @@ insert_episode_search_node(spotify_podcast_episode_node *node)
 }
 
 /**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+insert_device_list_node(spotify_device_list_node *node)
+{
+  /* point to previous head */
+  node->spotify_device_list_node = spotify_device_list_node_head;
+
+  /* new head */
+  spotify_device_list_node_head = node;
+}
+
+/**
  * prints all the nodes strings, has the parantheses wrapping
  * around them
  */
-void printList() {
+void
+printList()
+{
   struct song_info_node *ptr = song_info_head;
 
   while(ptr != NULL) {
@@ -227,8 +297,10 @@ void printList() {
  * prints all the nodes strings, has the parantheses wrapping
  * around them
  */
-void print_artists_search() {
-  struct spotify_related_artists *ptr = spotify_related_artists_head;
+void
+print_artists_search()
+{
+  spotify_related_artists *ptr = spotify_related_artists_head;
 
   u_int8_t counter = 0;
 
@@ -258,21 +330,33 @@ void print_artists_search() {
  * prints all the nodes strings, has the parantheses wrapping
  * around them
  */
-void print_related_artists() {
-  struct spotify_related_artists *ptr = spotify_related_artists_head;
+void
+print_related_artists()
+{
+  spotify_related_artists *ptr = spotify_related_artists_head;
 
   printf("Here some artists that you may like based of this song.\n\n");
 
-  while(ptr != NULL) {
+  while(ptr != NULL)
+	{
     printf("%s\n",ptr->artist_name);
     printf("[%s]\n\n",ptr->genre_array);
     ptr = ptr->spotify_related_artists_node;
   }
 }
 
-struct spotify_episode_query_info
-print_show_search_results(struct spotify_episode_query_info episode_info) {
-  struct spotify_podcast_search_node *ptr = spotify_podcast_search_node_head;
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+spotify_episode_query_info print_show_search_results(spotify_episode_query_info episode_info)
+{
+  spotify_podcast_search_node *ptr = spotify_podcast_search_node_head;
 
   u_int8_t counter = 0;
 
@@ -310,8 +394,9 @@ print_show_search_results(struct spotify_episode_query_info episode_info) {
  * prints all the nodes strings, has the parantheses wrapping
  * around them
  */
-char *print_searched_artists() {
-  struct spotify_artists_search_node *ptr = spotify_artists_search_node_head;
+char *
+print_searched_artists() {
+  spotify_artists_search_node *ptr = spotify_artists_search_node_head;
 
   u_int8_t counter = 0;
 
@@ -344,20 +429,22 @@ char *print_searched_artists() {
 * prints all the nodes strings, has the parantheses wrapping
  * around them
  */
-void print_top_tracks() {
-  struct spotify_top_tracks *track_ptr = spotify_top_track_head;
-  struct spotify_top_artists *artist_ptr = spotify_top_artist_head;
+void
+print_top_tracks()
+{
+  spotify_top_tracks *track_ptr = spotify_top_track_head;
+  spotify_top_artists *artist_ptr = spotify_top_artist_head;
 
-  struct spotify_top_tracks *track_tmp = spotify_top_track_head;
-  struct spotify_top_artists *artist_tmp = spotify_top_artist_head;
+  spotify_top_tracks *track_tmp = spotify_top_track_head;
+  spotify_top_artists *artist_tmp = spotify_top_artist_head;
 
   reverse_top_tracks(&track_ptr);
   reverse_top_artists(&artist_ptr);
 
-  printf("\t\tYour most played songs of 2021\t\t\t  Your most played artists of 2021\n");
-  printf("--------------------------------------------------------------------------------------------------\n");
+  printf("\t\tYour most played songs of 2022\t\t\t\t\t  Your most played artists of 2022\n");
+  printf("-------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
   while(track_ptr && artist_ptr)  {
-    printf("%-35s",track_ptr->song_name);
+    printf("%-100s",track_ptr->song_name);
     printf("%-30s",track_ptr->artist_name);
     printf("| %-30s|\n",artist_ptr->artist_name);
 
@@ -374,18 +461,20 @@ void print_top_tracks() {
     free(track_tmp);
     free(artist_tmp);
   }
-  printf("--------------------------------------------------------------------------------------------------\n");
+
+  printf("-------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 }
 
 /**
  * prints all the nodes strings, has the parantheses wrapping
  * around them
  */
-static void reverse(struct spotify_playlist_songs** head_ref)
+static void
+reverse(spotify_playlist_songs** head_ref)
 {
-  struct spotify_playlist_songs* prev = NULL;
-  struct spotify_playlist_songs* current = *head_ref;
-  struct spotify_playlist_songs* next = NULL;
+  spotify_playlist_songs* prev = NULL;
+  spotify_playlist_songs* current = *head_ref;
+  spotify_playlist_songs* next = NULL;
 
   while (current != NULL) 
   {
@@ -407,11 +496,12 @@ static void reverse(struct spotify_playlist_songs** head_ref)
  * prints all the nodes strings, has the parantheses wrapping
  * around them
  */
-void reverse_top_tracks(struct spotify_top_tracks** head_ref)
+void
+reverse_top_tracks(spotify_top_tracks** head_ref)
 {
-  struct spotify_top_tracks* prev = NULL;
-  struct spotify_top_tracks* current = *head_ref;
-  struct spotify_top_tracks* next = NULL;
+  spotify_top_tracks* prev = NULL;
+  spotify_top_tracks* current = *head_ref;
+  spotify_top_tracks* next = NULL;
 
   while (current != NULL) 
   {
@@ -434,11 +524,11 @@ void reverse_top_tracks(struct spotify_top_tracks** head_ref)
  * around them
  */
 void 
-reverse_top_artists(struct spotify_top_artists** spotify_top_artist_head)
+reverse_top_artists(spotify_top_artists** spotify_top_artist_head)
 {
-  struct spotify_top_artists* prev = NULL;
-  struct spotify_top_artists* current = *spotify_top_artist_head;
-  struct spotify_top_artists* next = NULL;
+  spotify_top_artists* prev = NULL;
+  spotify_top_artists* current = *spotify_top_artist_head;
+  spotify_top_artists* next = NULL;
 
   while (current != NULL) 
   {
@@ -456,8 +546,17 @@ reverse_top_artists(struct spotify_top_artists** spotify_top_artist_head)
   *spotify_top_artist_head = prev;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
-reverse_podcast_episodes(struct spotify_podcast_episode_node** spotify_podcast_episode_node_head)
+reverse_podcast_episodes(spotify_podcast_episode_node** spotify_podcast_episode_node_head)
 {
   spotify_podcast_episode_node *prev = NULL;
   spotify_podcast_episode_node *current = *spotify_podcast_episode_node_head;
@@ -482,14 +581,18 @@ reverse_podcast_episodes(struct spotify_podcast_episode_node** spotify_podcast_e
  * prints all the nodes strings, has the parantheses wrapping
  * around them
  */
-u_int8_t print_playlist_songs() {
-  struct spotify_playlist_songs *ptr = available_playlist_song_head;
-  struct spotify_playlist_songs *temp = NULL;
+u_int8_t
+print_playlist_songs()
+{
+  spotify_playlist_songs *ptr = available_playlist_song_head;
+  spotify_playlist_songs *temp = NULL;
+
   reverse(&ptr);
 
   u_int8_t counter = 0;
 
-  while(ptr != NULL) {
+  while(ptr != NULL)
+	{
     printf("%s[%d]%s %s%s%s (%s%s%s) by %s%s%s\n",
 	   "\x1B[36m",counter++,"\x1B[0m",
 	   "\x1B[31m",ptr->playlist_song_name,"\x1B[0m",
@@ -508,16 +611,20 @@ u_int8_t print_playlist_songs() {
 
   return choice;
 }
+
 /**
  * prints all the nodes strings, has the parantheses wrapping
  * around them
  */
-char *print_playlist() {
-  struct spotify_playlist_context *ptr = available_playlist_head; 
+char *
+print_playlist()
+{
+  spotify_playlist_context *ptr = available_playlist_head; 
 
   u_int8_t counter = 0;
 
-  while(ptr != NULL) {
+  while(ptr != NULL)
+	{
     printf("%s[%d]%s (%s) by %s\n",
 	   "\x1B[36m",counter++,"\x1B[0m",
 	   ptr->playlist_name,
@@ -541,8 +648,10 @@ char *print_playlist() {
 
   counter = 0;
   ptr = available_playlist_head;
-  while(ptr != NULL) {
-    if(counter == choice) {
+  while(ptr != NULL)
+	{
+    if(counter == choice)
+		{
       return ptr->playlist_uri;
       break;
     }
@@ -555,15 +664,26 @@ char *print_playlist() {
    return NULL;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 u_int16_t
-print_podcast_episodes() {
+print_podcast_episodes()
+{
   struct spotify_podcast_episode_node *ptr = spotify_podcast_episode_search_node_head; 
 
   reverse_podcast_episodes(&ptr);
 
   u_int8_t counter = 0;
 
-  while(ptr != NULL) {
+  while(ptr != NULL)
+	{
     printf("%s[%d]%s Episode title: %s\n\n Release date: %s\n\n Description: %s\n\n",
 	  "\x1B[36m",counter++,"\x1B[0m",
 	  ptr->name,
@@ -580,7 +700,8 @@ print_podcast_episodes() {
   while(true)
   {
     scanf("%d", &choice);
-    if(!(choice > -1 && choice < counter )) {
+    if(!(choice > -1 && choice < counter ))
+		{
       printf("\nplease enter the a valid range: ");
     } else
       break;
@@ -595,10 +716,10 @@ print_podcast_episodes() {
  * around them
  */
 
-struct spotify_song_query_info 
+spotify_song_query_info 
 print_avaible_songs(u_int8_t MAX_SEARCH) 
 {
-  struct spotify_song_search_node *ptr = available_song_search_head;
+  spotify_song_search_node *ptr = available_song_search_head;
 
   /* used to point to the node that we want album info from */
   u_int8_t counter = 0;
@@ -607,13 +728,14 @@ print_avaible_songs(u_int8_t MAX_SEARCH)
   /* char *album_id; */
   /* char *album_position; */
 
-  struct spotify_song_query_info req_node = {
+  spotify_song_query_info req_node = {
     .track_info = NULL,
     .track_position = NULL
   };
 
   /* display available songs */
-  while(ptr != NULL) {
+  while(ptr != NULL)
+	{
     printf("%s[%d]%s %s%s%s (%s%s%s) by %s%s%s\n",
 	   "\x1B[36m",counter++,"\x1B[0m",
 	   "\x1B[31m",ptr->song_title,"\x1B[0m",
@@ -639,8 +761,10 @@ print_avaible_songs(u_int8_t MAX_SEARCH)
       break;
   }
 
-  while(ptr) {
-    if(counter == choice) {
+  while(ptr)
+	{
+    if(counter == choice)
+		{
       req_node.track_info = ptr->album_api_info;
       req_node.track_position = ptr->album_position;
       break;
@@ -653,6 +777,15 @@ print_avaible_songs(u_int8_t MAX_SEARCH)
   return req_node;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 spotify_song_query_info 
 print_searched_artist_results(u_int8_t MAX_SEARCH) 
 {
@@ -673,7 +806,8 @@ print_searched_artist_results(u_int8_t MAX_SEARCH)
 
   printf("\nHere are the top tracks for this artist!\n");
   /* display available songs */
-  while(song_ptr != NULL) {
+  while(song_ptr != NULL)
+	{
     printf("%s[%d]%s %s%s%s (%s%s%s) by %s%s%s\n",
 	   "\x1B[36m",counter++,"\x1B[0m",
 	   "\x1B[31m",song_ptr->song_title,"\x1B[0m",
@@ -684,7 +818,8 @@ print_searched_artist_results(u_int8_t MAX_SEARCH)
 
   printf("\nHere are albums associated with this artist!\n");
 
-  while(album_ptr != NULL) {
+  while(album_ptr != NULL)
+	{
     printf("%s%s%s\n",
 	   "\x1B[31m",album_ptr->album_name,"\x1B[0m");
     album_ptr = album_ptr->next;
@@ -701,14 +836,17 @@ print_searched_artist_results(u_int8_t MAX_SEARCH)
   while(true)
   {
     scanf("%d", &choice);
-    if(!(choice > -1 && choice < MAX_SEARCH )) {
+    if(!(choice > -1 && choice < MAX_SEARCH ))
+		{
       printf("\nplease enter the a valid range: ");
     } else
       break;
   }
 
-  while(song_ptr) {
-    if(counter == choice) {
+  while(song_ptr)
+	{
+    if(counter == choice)
+		{
       req_node.track_info = song_ptr->album_api_info;
       req_node.track_position = song_ptr->album_position;
       break;
@@ -721,13 +859,47 @@ print_searched_artist_results(u_int8_t MAX_SEARCH)
   return req_node;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+print_available_devices()
+{
+  spotify_device_list_node *ptr = spotify_device_list_node_head;
+
+  while(ptr != NULL)
+	{
+    printf("(%s) \n",ptr->device_id);
+    printf("(%s) \n",ptr->device_name);
+    ptr = ptr->spotify_device_list_node;
+  }
+	
+   printf("\n");
+}
+
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void
 clear_playlist()
 {
-  struct spotify_playlist_context *ptr = available_playlist_head; 
-  struct spotify_playlist_context *temp = NULL; 
+  spotify_playlist_context *ptr = available_playlist_head; 
+  spotify_playlist_context *temp = NULL; 
 
-  while(ptr != NULL) {
+  while(ptr != NULL)
+	{
     temp = ptr;
     ptr = ptr->next;
     free(temp->playlist_name);
@@ -745,13 +917,14 @@ void
 clear_linked_list() 
 {
   /* we dont want to mess with the actual head */
-  struct song_info_node *ptr = song_info_head; 
+  song_info_node *ptr = song_info_head; 
   
   /* holds the node that will be deleted */
-  struct song_info_node *temp = NULL; 
+  song_info_node *temp = NULL; 
 
   /* as long as we are referencing something, do it */
-  while(ptr) {
+  while(ptr)
+	{
     /* free the data, or else it just sits there */
     free(ptr->data);
 
@@ -773,13 +946,14 @@ clear_search_list()
 {
   
   /* we dont want to mess with the actual head */
-  struct spotify_song_search_node *ptr = available_song_search_head; 
+  spotify_song_search_node *ptr = available_song_search_head; 
   
   /* holds the node that will be deleted */
-  struct spotify_song_search_node *temp; 
+  spotify_song_search_node *temp; 
 
   /* as long as we are referencing something, do it */
-  while(ptr) {
+  while(ptr)
+	{
     /* free the data, or else it just sits there */
     free(ptr->album_api_info);
     free(ptr->album_name);
@@ -801,11 +975,13 @@ clear_search_list()
  * prints all the nodes strings, has the parantheses wrapping
  * around them
  */
-void clear_related_artists() {
-  struct spotify_related_artists *ptr = spotify_related_artists_head;
-  struct spotify_related_artists *temp = NULL;
+void
+clear_related_artists() {
+  spotify_related_artists *ptr = spotify_related_artists_head;
+  spotify_related_artists *temp = NULL;
 
-  while(ptr != NULL) {
+  while(ptr != NULL)
+	{
     temp = ptr;
     ptr = ptr->spotify_related_artists_node;
     free(temp->artist_name);

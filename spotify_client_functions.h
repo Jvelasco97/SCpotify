@@ -5,6 +5,7 @@
 
 void get_config_values(spotify_auth_payload *);
 void regenerate_token(scpotify_context *);
+void transfer_playback(scpotify_context *);
 void handle_token_regen(scpotify_context *, u_int8_t , char *);
 void spotify_show_current_song(scpotify_context *);
 void spotify_display_tops(scpotify_context *);

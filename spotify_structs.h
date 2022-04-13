@@ -162,6 +162,15 @@ typedef struct spotify_artists_search_node
   char *artists_id;
 
   struct spotify_artists_search_node *spotify_artists_search_node;
-} spotify_artists_search_node; 
+} spotify_artists_search_node;
+
+
+typedef struct spotify_device_list_node
+{
+  char *device_id;
+  char *device_name;
+
+  struct spotify_device_list_node *spotify_device_list_node;
+} spotify_device_list_node; 
 
 #endif

@@ -8,18 +8,32 @@
 #include "spotify_structs.h"
 #include "spotify_utils.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #define AUTH_TOKEN_LENGTH 322
 #define TOKEN_URL_LENGHT 209
+#define CONFIG_TOKEN_DISPLACEMENT 14
+#define CONFIG_ACCESS_TOKEN_LENGTH 307
 
-void get_config_values(spotify_auth_payload *payload) {
+#define STATUS_OK 200
+
+/**
+ * @brief gets the config values from the file
+ * @param payload - the payload for thr http call
+ * @return none
+ */
+void
+get_config_values(spotify_auth_payload *payload)
+{
   FILE *in;
 
   char buffer_in[324];
 
   in = fopen(token_location, "r");
 
-  if (in == NULL) {
+  if (in == NULL)
+	{
+		printf("Error: could not open config file...\n");
     exit(EXIT_FAILURE);
   }
 
@@ -37,7 +51,14 @@ void get_config_values(spotify_auth_payload *payload) {
   fclose(in);
 }
 
-void free_previous_context(scpotify_context **cmd_args) {
+/**
+ * @brief frees failed auth credentials
+ * @param cmd_args
+ * @return none
+ */
+void
+free_previous_context(scpotify_context **cmd_args)
+{
   free((*cmd_args)->auth_struct->auth_token);
   free((*cmd_args)->auth_struct->refresh_token);
   free((*cmd_args)->auth_struct->base64_client_secret);
@@ -45,13 +66,20 @@ void free_previous_context(scpotify_context **cmd_args) {
   free((*cmd_args)->endpoint);
 }
 
-void set_refresh_token_context(scpotify_context *cmd_args) {
+/**
+ * @brief set the context for the refrsh http call
+ * @param cmd_args
+ * @return none
+ */
+void
+set_refresh_token_context(scpotify_context *cmd_args)
+{
   /* TODO call concat striong instead of build_search */
   cmd_args->http_type = POST;
   cmd_args->endpoint = "https://accounts.spotify.com/api/"
                        "token?grant_type=refresh_token&refresh_token=";
   cmd_args->search_struct->search_query =
-      cmd_args->auth_struct->refresh_token + 14;
+      cmd_args->auth_struct->refresh_token + CONFIG_TOKEN_DISPLACEMENT;
   cmd_args->endpoint = build_search_query(cmd_args);
   cmd_args->search_struct->spotify_json_data = "{}";
   cmd_args->enable_write = true;
@@ -59,44 +87,79 @@ void set_refresh_token_context(scpotify_context *cmd_args) {
   cmd_args->endpoint[TOKEN_URL_LENGHT] = 0;
 }
 
-void write_new_token_to_config(char *token) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+write_new_token_to_config(char *token)
+{
   FILE *in;
 
-  char buffer_in[256];
+  char buffer_in[CONFIG_ACCESS_TOKEN_LENGTH];
 
   in = fopen(token_location, "r+");
 
-  if (in == NULL) {
+  if (in == NULL)
+	{
+		printf("Error: failed to open file...\n");
     exit(EXIT_FAILURE);
   }
 
   int counter = 0;
 
-  while (fgets(buffer_in, 256, in) != NULL) {
+  while (fgets(buffer_in, CONFIG_ACCESS_TOKEN_LENGTH, in) != NULL)
+	{
     counter++;
-    if (counter == 2) {
-      snprintf(buffer_in, 256, "%s\n", token);
+    if (counter == 2)
+		{
+      snprintf(buffer_in, CONFIG_ACCESS_TOKEN_LENGTH, "%s\n", token);
       fwrite(token, sizeof(char), strlen(token), in);
-      /* size_t bytesWrote = fwrite(token, sizeof(char), strlen(token), in); */
     }
   }
 
   fclose(in);
 }
 
-void regenerate_token(scpotify_context *cmd_args) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+regenerate_token(scpotify_context *cmd_args)
+{
   set_refresh_token_context(cmd_args);
 
   spotify_auth_http(cmd_args);
-  char *token =
-      parse_auth_token(&cmd_args->search_struct->spotify_json_response);
+  char *token = parse_auth_token(&cmd_args->search_struct->spotify_json_response);
   free_previous_context(&cmd_args);
   write_new_token_to_config(token);
+
   free(token);
 }
 
-void handle_token_regen(scpotify_context *cmd_args, u_int8_t http_type,
-                        char *endpoint) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+handle_token_regen(scpotify_context *cmd_args, u_int8_t http_type, char *endpoint)
+{
   regenerate_token(cmd_args);
 
   /* reset the context of the command */
@@ -107,9 +170,85 @@ void handle_token_regen(scpotify_context *cmd_args, u_int8_t http_type,
   spotify_http(cmd_args);
 }
 
-void spotify_show_current_song(struct scpotify_context *cmd_args) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+transfer_playback(scpotify_context *cmd_args)
+{
+	cmd_args->endpoint = "https://api.spotify.com/v1/me/player";
+	cmd_args->http_type = PUT;
+	cmd_args->enable_write = true;
+
+	cmd_args->search_struct->spotify_json_data = "{\"device_ids\":[\"25c86e6bbd56ddea209ff30b89abe3bbaeda06b4\"]}";
+
+  if (spotify_http(cmd_args) != STATUS_OK)
+	{
+    free(cmd_args->search_struct->spotify_json_response);
+    handle_token_regen(cmd_args, GET, cmd_args->endpoint);
+		if (spotify_http(cmd_args) != STATUS_OK)
+		{
+			printf("\nLooks like spotifyd isn't running...\n");
+			exit(EXIT_FAILURE);
+		}
+  }
+}
+
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+spotify_list_choose_device(struct scpotify_context *cmd_args)
+{
+	cmd_args->endpoint = "https://api.spotify.com/v1/me/player/devices";
+	cmd_args->http_type = GET;
+	cmd_args->enable_write = true;
+
+  if (spotify_http(cmd_args) != STATUS_OK)
+	{
+    /* modify auth struct */
+    free(cmd_args->search_struct->spotify_json_response);
+    handle_token_regen(cmd_args, GET, cmd_args->endpoint);
+  }
+
+	printf("%s\n", cmd_args->search_struct->spotify_json_response);
+
+  parse_device_list(cmd_args->search_struct->spotify_json_response);
+
+  print_available_devices();
+
+
+  /* cleanup */
+  /* free(cmd_args->search_struct->spotify_json_response); */
+}
+
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+spotify_show_current_song(struct scpotify_context *cmd_args)
+{
   /* hit the endpoint, get the response and parse */
-  if (spotify_http(cmd_args) != 200) {
+  if (spotify_http(cmd_args) != STATUS_OK)
+	{
     /* modify auth struct */
     free(cmd_args->search_struct->spotify_json_response);
     handle_token_regen(cmd_args, GET, cmd_args->endpoint);
@@ -125,8 +264,20 @@ void spotify_show_current_song(struct scpotify_context *cmd_args) {
   clear_search_list();
 }
 
-void spotify_display_tops(struct scpotify_context *cmd_args) {
-  if (spotify_http(cmd_args) != 200) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+spotify_display_tops(struct scpotify_context *cmd_args)
+{
+  if (spotify_http(cmd_args) != STATUS_OK)
+	{
     /* modify auth struct */
     free(cmd_args->search_struct->spotify_json_response);
     handle_token_regen(cmd_args, GET, cmd_args->endpoint);
@@ -143,13 +294,35 @@ void spotify_display_tops(struct scpotify_context *cmd_args) {
   free(cmd_args->search_struct->spotify_json_response);
 }
 
-void cleanup_playlist(scpotify_context *cmd_args) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+cleanup_playlist(scpotify_context *cmd_args)
+{
   free(cmd_args->search_struct->spotify_json_response);
   free(cmd_args->search_struct->spotify_json_data);
   clear_playlist();
 }
 
-void change_playlist_to_play_command(scpotify_context *cmd_args) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+change_playlist_to_play_command(scpotify_context *cmd_args)
+{
   /* since the response object gives us the endpoint in the response object,  */
   /* we can return the string to it */
   cmd_args->endpoint = parse_selected_playlist_json(
@@ -165,12 +338,23 @@ void change_playlist_to_play_command(scpotify_context *cmd_args) {
 
   cmd_args->endpoint =
       "https://api.spotify.com/v1/me/player/"
-      "play?device_id=b49a5780a99ea81284fc0746a78f84a30e4d5c73";
+      "play";
 }
 
-void spotify_play_playlist(struct scpotify_context *cmd_args) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void spotify_play_playlist(struct scpotify_context *cmd_args)
+{
   /* retrieve all playlists */
-  if (spotify_http(cmd_args) != 200) {
+  if (spotify_http(cmd_args) != STATUS_OK)
+	{
     /* modify auth struct */
     free(cmd_args->search_struct->spotify_json_response);
     handle_token_regen(cmd_args, GET, cmd_args->endpoint);
@@ -197,7 +381,18 @@ void spotify_play_playlist(struct scpotify_context *cmd_args) {
   cleanup_playlist(cmd_args);
 }
 
-void build_related_artist_url(scpotify_context *cmd_args) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+build_related_artist_url(scpotify_context *cmd_args)
+{
   char *artist_id =
       parse_artist_id(cmd_args->search_struct->spotify_json_response);
   cmd_args->endpoint = "https://api.spotify.com/v1/artists/";
@@ -215,14 +410,37 @@ void build_related_artist_url(scpotify_context *cmd_args) {
   free(artist_id);
 }
 
-void cleanup_related_artists(scpotify_context *cmd_args) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+cleanup_related_artists(scpotify_context *cmd_args)
+{
   free(cmd_args->endpoint);
   free(cmd_args->search_struct->spotify_json_response);
   clear_related_artists();
 }
 
-void spotify_show_related_artists(struct scpotify_context *cmd_args) {
-  if (spotify_http(cmd_args) != 200) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+spotify_show_related_artists(struct scpotify_context *cmd_args)
+{
+  if (spotify_http(cmd_args) != STATUS_OK)
+	{
     /* modify auth struct */
     free(cmd_args->search_struct->spotify_json_response);
     handle_token_regen(cmd_args, GET, cmd_args->endpoint);
@@ -238,15 +456,28 @@ void spotify_show_related_artists(struct scpotify_context *cmd_args) {
   cleanup_related_artists(cmd_args);
 }
 
-void spotify_play_song(struct scpotify_context *cmd_args,
-                       struct spotify_song_query_info req) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+spotify_play_song(scpotify_context *cmd_args, spotify_song_query_info req)
+{
   /* build endpoint for search & parse needed info*/
   cmd_args->endpoint = build_search_query(cmd_args);
-  if (spotify_http(cmd_args) != 200) {
+
+  if (spotify_http(cmd_args) != STATUS_OK)
+	{
     /* modify auth struct */
     free(cmd_args->search_struct->spotify_json_response);
     handle_token_regen(cmd_args, GET, cmd_args->endpoint);
   }
+
 
   parse_search_info(cmd_args->search_struct->spotify_json_response);
   req = print_avaible_songs(5);
@@ -257,8 +488,7 @@ void spotify_play_song(struct scpotify_context *cmd_args,
 
   free(cmd_args->endpoint);
   cmd_args->endpoint =
-      "https://api.spotify.com/v1/me/player/"
-      "play?device_id=b49a5780a99ea81284fc0746a78f84a30e4d5c73";
+      "https://api.spotify.com/v1/me/player/play?device=25c86e6bbd56ddea209ff30b89abe3bbaeda06b4";
 
   cmd_args->search_struct->spotify_json_data =
       build_put_request(req.track_info, req.track_position);
@@ -270,17 +500,26 @@ void spotify_play_song(struct scpotify_context *cmd_args,
   clear_search_list();
 }
 
-void spotify_play_podcast(struct scpotify_context *cmd_args) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+spotify_play_podcast(struct scpotify_context *cmd_args)
+{
   /* build endpoint for search & parse needed info*/
   cmd_args->search_struct->query_type = PODCAST_QUERY;
   cmd_args->endpoint = build_search_query(cmd_args);
-  if (spotify_http(cmd_args) != 200) {
+  if (spotify_http(cmd_args) != STATUS_OK) {
     /* modify auth struct */
     free(cmd_args->search_struct->spotify_json_response);
     handle_token_regen(cmd_args, GET, cmd_args->endpoint);
   }
-
-  /* printf("%s\n", cmd_args->search_struct->spotify_json_response); */
 
   parse_shows(cmd_args->search_struct->spotify_json_response);
   free(cmd_args->search_struct->spotify_json_response);
@@ -305,7 +544,7 @@ void spotify_play_podcast(struct scpotify_context *cmd_args) {
   free(cmd_args->endpoint);
   cmd_args->endpoint =
       "https://api.spotify.com/v1/me/player/"
-      "play?device_id=b49a5780a99ea81284fc0746a78f84a30e4d5c73";
+      "play";
 
   cmd_args->search_struct->spotify_json_data = build_put_request_episode(query.podcast_id, query.number_of_episodes, position);
   cmd_args->http_type = PUT;
@@ -318,7 +557,18 @@ void spotify_play_podcast(struct scpotify_context *cmd_args) {
   /* clear_search_list(); */
 }
 
-void spotify_play_searched_artist(scpotify_context *cmd_args, spotify_song_query_info req) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+spotify_play_searched_artist(scpotify_context *cmd_args, spotify_song_query_info req)
+{
   /* build endpoint for search & parse needed info*/
   cmd_args->endpoint = build_search_query(cmd_args);
   spotify_http(cmd_args);
@@ -353,19 +603,41 @@ void spotify_play_searched_artist(scpotify_context *cmd_args, spotify_song_query
   clear_search_list();
 }
 
-void recents_change_to_play(scpotify_context *cmd_args, spotify_song_query_info req) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+recents_change_to_play(scpotify_context *cmd_args, spotify_song_query_info req)
+{
   cmd_args->http_type = PUT;
   cmd_args->enable_write = false;
   cmd_args->endpoint =
       "https://api.spotify.com/v1/me/player/"
-      "play?device_id=b49a5780a99ea81284fc0746a78f84a30e4d5c73";
+      "play";
   cmd_args->search_struct->spotify_json_data =
       build_put_request(req.track_info, req.track_position);
 }
 
-void spotify_play_recents(struct scpotify_context *cmd_args, struct spotify_song_query_info req) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+spotify_play_recents(struct scpotify_context *cmd_args, struct spotify_song_query_info req)
+{
   /* build endpoint for search & parse needed info*/
-  if (spotify_http(cmd_args) != 200) {
+  if (spotify_http(cmd_args) != STATUS_OK) {
     /* modify auth struct */
     free(cmd_args->search_struct->spotify_json_response);
     handle_token_regen(cmd_args, GET, cmd_args->endpoint);
@@ -384,7 +656,18 @@ void spotify_play_recents(struct scpotify_context *cmd_args, struct spotify_song
   clear_search_list();
 }
 
-void change_queue_to_play(scpotify_context *cmd_args, spotify_song_query_info req) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+change_queue_to_play(scpotify_context *cmd_args, spotify_song_query_info req)
+{
   cmd_args->search_struct->query_type = SONG_QUERY;
   cmd_args->search_struct->search_query = req.track_info;
   cmd_args->http_type = POST;
@@ -395,12 +678,23 @@ void change_queue_to_play(scpotify_context *cmd_args, spotify_song_query_info re
   cmd_args->endpoint = build_search_query(cmd_args);
 }
 
-void spotify_add_song_queue(struct scpotify_context *cmd_args, struct spotify_song_query_info req) {
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+spotify_add_song_queue(struct scpotify_context *cmd_args, struct spotify_song_query_info req)
+{
   /* fetch songs and parse */
   cmd_args->search_struct->query_type = SONG_QUERY;
   cmd_args->endpoint = build_search_query(cmd_args);
 
-  if (spotify_http(cmd_args) != 200) {
+  if (spotify_http(cmd_args) != STATUS_OK) {
     /* modify auth struct */
     free(cmd_args->search_struct->spotify_json_response);
     handle_token_regen(cmd_args, GET, cmd_args->endpoint);
@@ -419,9 +713,19 @@ void spotify_add_song_queue(struct scpotify_context *cmd_args, struct spotify_so
   free(cmd_args->endpoint);
 }
 
-void spotifyC(struct scpotify_context *cmd_args, struct spotify_song_query_info req) 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+spotifyC(struct scpotify_context *cmd_args, struct spotify_song_query_info req) 
 {
-  switch (cmd_args->spotify_command) 
+  switch (cmd_args->spotify_command)
   {
   case SPOTIFY_RELATED_ARTISTS:
     spotify_show_related_artists(cmd_args);
@@ -469,7 +773,17 @@ void spotifyC(struct scpotify_context *cmd_args, struct spotify_song_query_info 
   }
 }
 
-void init_search(spotify_search_context *search) 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+init_search(spotify_search_context *search) 
 {
   search->spotify_json_response = NULL;
   search->spotify_json_data = NULL;
@@ -477,7 +791,17 @@ void init_search(spotify_search_context *search)
   search->query_type = 0;
 }
 
-void init_cmd_args(scpotify_context *cmd_args) 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+init_cmd_args(scpotify_context *cmd_args) 
 {
   cmd_args->endpoint = NULL;
   cmd_args->enable_write = false;
@@ -488,16 +812,36 @@ void init_cmd_args(scpotify_context *cmd_args)
   get_config_values(cmd_args->auth_struct);
 }
 
-void free_auth_payload(scpotify_context *cmd_args) 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+free_auth_payload(scpotify_context *cmd_args) 
 {
   free(cmd_args->auth_struct->base64_client_secret);
   free(cmd_args->auth_struct->refresh_token);
   free(cmd_args->auth_struct->auth_token);
 }
 
-void free_args_and_search(scpotify_context *cmd_args, spotify_search_context *search, spotify_auth_payload *auth) 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void
+free_args_and_search(scpotify_context *cmd_args, spotify_search_context *search, spotify_auth_payload *auth) 
 {
-  free(search);
+
   free(cmd_args);
   free(auth);
 }

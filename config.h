@@ -1,1 +1,1 @@
-const char token_location[] = "/home/xerothyl/.config/Scpotify/config.ini";
+const char token_location[] = "/home/xerothyl/.config/scpotify/config.ini";

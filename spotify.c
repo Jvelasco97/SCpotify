@@ -7,7 +7,9 @@
 #include "main_includes.h"
 #include <stdio.h>
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
+
 
   /* instantiate the struct for the command line and search queries */
   scpotify_context *cmd_args = (scpotify_context*) malloc(sizeof(scpotify_context));
@@ -20,16 +22,18 @@ int main(int argc, char **argv) {
 
   init_cmd_args(cmd_args);
 
+
   /* process the command line options */
   if(argc > 1)
   {
+		transfer_playback(cmd_args);
     process_args(argc, argv, cmd_args);
 
     /* call http and parse */
     spotifyC(cmd_args, req);
 
-    free_auth_payload(cmd_args);
-    free_args_and_search(cmd_args, search, auth);
+		free_auth_payload(cmd_args); 
+		free_args_and_search(cmd_args, search, auth); 
   } 
   else
   {

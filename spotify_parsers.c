@@ -1,8 +1,19 @@
 #include "spotify_parsers.h"
 #include "spotify_ll.h"
 #include "includes.h"
+#include <stdio.h>
 #include <string.h>
 
+
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 char *
 parse_selected_playlist_json(char *json_web_data)
 {
@@ -31,7 +42,8 @@ parse_selected_playlist_json(char *json_web_data)
   json_position = &(json_position[strlen(json_anchor) - 1]);
 
 
-  while ((json_position = strstr(json_position, json_track_info))) {
+  while ((json_position = strstr(json_position, json_track_info)))
+	{
     struct spotify_playlist_songs *temp = 
     (struct spotify_playlist_songs*) malloc(sizeof(struct spotify_playlist_songs));
 
@@ -67,7 +79,8 @@ parse_currently_playing(char *json_web_data)
 
   /* searches the whole string and finds the sub string
    returns pointer to the beggining of the found string */
-  while ((json_position = strstr(json_position, json_parse_string))) {
+  while ((json_position = strstr(json_position, json_parse_string)))
+	{
 
     /* adjust new starting point */
     json_position = &(json_position[strlen(json_parse_string) - 1]);
@@ -109,7 +122,8 @@ parse_search_info(char *json_web_data)
 
   /* searches the whole string and finds the sub string
    returns pointer to the beggining of the found string */
-  while ((json_position = strstr(json_position, find_artist))) {
+  while ((json_position = strstr(json_position, find_artist)))
+	{
     json_position = &(json_position[strlen(find_artist) - 1]);
 
     struct spotify_song_search_node *temp = 
@@ -157,7 +171,8 @@ parse_playlist_json(char *json_web_data)
 
   /* searches the whole string and finds the sub string
    returns pointer to the beggining of the found string */
-  while ((json_position = strstr(json_position, json_anchor))) {
+  while ((json_position = strstr(json_position, json_anchor)))
+	{
     json_position = &(json_position[strlen(json_anchor) - 1]);
 
     struct spotify_playlist_context *temp = 
@@ -195,7 +210,8 @@ parse_queue_search_info(char *json_web_data)
 
   /* searches the whole string and finds the sub string
    returns pointer to the beggining of the found string */
-  while ((json_position = strstr(json_position, find_artist))) {
+  while ((json_position = strstr(json_position, find_artist)))
+	{
     json_position = &(json_position[strlen(find_artist) - 1]);
 
     struct spotify_song_search_node *temp = 
@@ -210,6 +226,15 @@ parse_queue_search_info(char *json_web_data)
   }
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 char *
 insert_parsed_playlist_info(char **json_position, const char **search, int displacement, bool insert)
 {
@@ -243,6 +268,15 @@ insert_parsed_playlist_info(char **json_position, const char **search, int displ
     return NULL;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
 parse_top_tracks(char *json_web_data)
 {
@@ -255,7 +289,8 @@ parse_top_tracks(char *json_web_data)
 
   /* searches the whole string and finds the sub string
    returns pointer to the beggining of the found string */
-  while ((json_position = strstr(json_position, anchor))) {
+  while ((json_position = strstr(json_position, anchor)))
+	{
     json_position = &(json_position[strlen(anchor) - 1]);
     (json_position = strstr(json_position, anchor));
     json_position = &(json_position[strlen(anchor) - 1]);
@@ -270,6 +305,15 @@ parse_top_tracks(char *json_web_data)
   }
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 char * 
 parse_artist_id(char *json_web_data)
 {
@@ -296,6 +340,15 @@ parse_artist_id(char *json_web_data)
   return ptr;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
 parse_related_artists(char *json_web_data)
 {
@@ -308,7 +361,8 @@ parse_related_artists(char *json_web_data)
 
   /* searches the whole string and finds the sub string
    returns pointer to the beggining of the found string */
-  while ((json_position = strstr(json_position, find_genre))) {
+  while ((json_position = strstr(json_position, find_genre)))
+	{
     json_position = &(json_position[strlen(find_genre) - 1]);
 
     struct spotify_related_artists *temp = 
@@ -321,6 +375,15 @@ parse_related_artists(char *json_web_data)
   }
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
 parse_searched_artists(char *json_web_data)
 {
@@ -335,7 +398,8 @@ parse_searched_artists(char *json_web_data)
 
   /* searches the whole string and finds the sub string
    returns pointer to the beggining of the found string */
-  while ((json_position = strstr(json_position, anchor))) {
+  while ((json_position = strstr(json_position, anchor)))
+	{
     json_position = &(json_position[strlen(anchor) - 1]);
 
     struct spotify_artists_search_node *temp = 
@@ -349,6 +413,15 @@ parse_searched_artists(char *json_web_data)
   }
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
 parse_top_artists(char *json_web_data)
 {
@@ -358,7 +431,8 @@ parse_top_artists(char *json_web_data)
 
   /* searches the whole string and finds the sub string
    returns pointer to the beggining of the found string */
-  while ((json_position = strstr(json_position, find_name))) {
+  while ((json_position = strstr(json_position, find_name)))
+	{
     json_position = &(json_position[strlen(find_name) - 1]);
 
     struct spotify_top_artists *temp = 
@@ -370,6 +444,15 @@ parse_top_artists(char *json_web_data)
   }
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
 parse_albums(char *json_web_data)
 {
@@ -381,7 +464,8 @@ parse_albums(char *json_web_data)
 
   /* searches the whole string and finds the sub string
    returns pointer to the beggining of the found string */
-  while ((json_position = strstr(json_position, find_images))) {
+  while ((json_position = strstr(json_position, find_images)))
+	{
     json_position = &(json_position[strlen(find_images) - 1]);
 
     struct spotify_album_search_node *temp = 
@@ -394,6 +478,15 @@ parse_albums(char *json_web_data)
   }
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
 parse_shows(char *json_web_data)
 {
@@ -425,6 +518,50 @@ parse_shows(char *json_web_data)
   }
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
+void 
+parse_device_list(char *json_web_data)
+{
+  const char *hook = "{";
+  const char *find_id = "id";
+  const char *find_name = "name";
+
+  char *json_position = json_web_data;
+
+  /* searches the whole string and finds the sub string
+   returns pointer to the beggining of the found string */
+  while ((json_position = strstr(json_position, hook))) 
+  {
+    json_position = &(json_position[strlen(hook) - 1]);
+
+
+    struct spotify_device_list_node *temp =
+    (struct spotify_device_list_node*) malloc(sizeof(struct spotify_device_list_node));
+
+    temp->device_id = insert_parsed_data(&json_position, &find_id, 6, true);
+    temp->device_name = insert_parsed_data(&json_position, &find_name, 6, true);
+
+    insert_device_list_node(temp);
+  }
+}
+
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
 parse_podcast_episodes(char *json_web_data)
 {
@@ -497,6 +634,15 @@ insert_parsed_data(char **json_position, const char **search, int displacement, 
   return NULL;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 char *
 insert_top_artist(char **json_position, const char **search) 
 {
@@ -517,6 +663,15 @@ insert_top_artist(char **json_position, const char **search)
   return ptr;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 char *
 parse_auth_token(char **json_res)
 {
@@ -524,9 +679,9 @@ parse_auth_token(char **json_res)
   //point to start, then point to end
   //use malloc and memcpy to it
   
-  char *ptr = malloc(sizeof(char) * 301);
-  memcpy(ptr, *json_res + 17, 300);
-  ptr[300] = 0;
+  char *ptr = malloc(sizeof(char) * 307);
+  memcpy(ptr, *json_res + 17, 307);
+  ptr[306] = 0;
 
 
   return ptr;
@@ -548,18 +703,26 @@ cut(char *artist_info)
   /* roughly how big its going to be */
   for(int i = 0; i < MAX_STRING; i++) 
   {
-    if(artist_info[i + 1] == '\n') {
+    if(artist_info[i + 1] == '\n')
+		{
       return distance;
-    } else if(artist_info[i + 1] == ',' && artist_info[i + 2] == '\n') {
-      /* pre increment as we want the return value incremented before hand */
-      return ++distance;
-    } else if(artist_info[i + 1] == ']' && artist_info[i + 2] == ',' && artist_info[i+3] == '\n') {
-      /* pre increment as we want the return value incremented before hand */
-      return ++distance;
-    } else if(artist_info[i + 1] == '\"' && artist_info[i + 2] == ',' && artist_info[i+3] == '\n') {
+    }
+		else if(artist_info[i + 1] == ',' && artist_info[i + 2] == '\n')
+		{
       /* pre increment as we want the return value incremented before hand */
       return ++distance;
     }
+		else if(artist_info[i + 1] == ']' && artist_info[i + 2] == ',' && artist_info[i+3] == '\n')
+		{
+      /* pre increment as we want the return value incremented before hand */
+      return ++distance;
+    }
+		else if(artist_info[i + 1] == '\"' && artist_info[i + 2] == ',' && artist_info[i+3] == '\n')
+		{
+      /* pre increment as we want the return value incremented before hand */
+      return ++distance;
+    }
+
     distance++;
   }
 

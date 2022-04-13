@@ -3,9 +3,10 @@
 #include "spotify_utils.h"
 #include "spotify_command_defines.h"
 #include <curl/curl.h>
+#include <stdio.h>
 #include <sys/types.h>
 
-#define AUTH_TOKEN_LENGHT 300
+#define AUTH_TOKEN_LENGHT 307
 
 /**
  * this function actually gets called multiple times, it gets called
@@ -28,11 +29,13 @@ StoreData(char *contents, size_t size, size_t nmemb, void *user_struct)
   /* basically if the max size - current size = availabke space is less than
    * than the  */
   /* new packet size, then reallocate */
-  if (json_res->allocated_max_size - json_res->current_size <= realsize) {
+  if (json_res->allocated_max_size - json_res->current_size <= realsize)
+	{
     char *new_mem_ptr =
         realloc(json_res->data, json_res->allocated_max_size += realsize * 2);
 
-    if (new_mem_ptr == NULL) {
+    if (new_mem_ptr == NULL)
+		{
       fprintf(stderr, "not enough memory (realloc returned NULL)\n");
       return 0;
     }
@@ -50,6 +53,15 @@ StoreData(char *contents, size_t size, size_t nmemb, void *user_struct)
   return realsize;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
 curl_setopt(CURL *curl, struct scpotify_context *args, struct curl_slist *headers, char *req_type)
 {
@@ -58,6 +70,15 @@ curl_setopt(CURL *curl, struct scpotify_context *args, struct curl_slist *header
   curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
 spotify_http_perform(CURL *curl, struct scpotify_context *args, CURLcode res, struct curl_slist *headers)
 {
@@ -104,6 +125,15 @@ spotify_http_perform(CURL *curl, struct scpotify_context *args, CURLcode res, st
   }
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 long 
 spotify_http(struct scpotify_context *args) {
   CURL *curl;
@@ -122,12 +152,14 @@ spotify_http(struct scpotify_context *args) {
 
   curl = curl_easy_init();
 
-  if (curl) {
+  if (curl)
+	{
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     
     spotify_http_perform(curl, args, res, headers);
 
-    if (CURLE_OK == res) {
+    if (CURLE_OK == res)
+		{
       char *ct;
       res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct);
       curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
@@ -141,8 +173,18 @@ spotify_http(struct scpotify_context *args) {
   return http_code;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 void 
-spotify_auth_http(struct scpotify_context *args) {
+spotify_auth_http(struct scpotify_context *args)
+{
   CURL *curl;
   CURLcode res = 0;
   struct curl_slist *headers = NULL;
@@ -165,20 +207,25 @@ spotify_auth_http(struct scpotify_context *args) {
   web_data.current_size = 0;
   web_data.allocated_max_size = 16;
 
+
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
   curl_easy_setopt(curl, CURLOPT_URL, args->endpoint);
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, StoreData);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &web_data);
 
+
   res = curl_easy_perform(curl);
   args->search_struct->spotify_json_response = web_data.data;
 
-  if (curl) {
+
+  if (curl)
+	{
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     
 
-    if (CURLE_OK == res) {
+    if (CURLE_OK == res)
+		{
       char *ct;
       res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct);
       curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
@@ -190,6 +237,15 @@ spotify_auth_http(struct scpotify_context *args) {
   free(header);
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 char *
 build_search_query(struct scpotify_context *args)
 {
@@ -200,7 +256,8 @@ build_search_query(struct scpotify_context *args)
   char *encoded_string = NULL;
   encoded_string = url_encoder(args->search_struct->search_query, args->search_struct->query_type);
 
-  if ((endpoint = malloc(strlen(args->endpoint) + strlen(encoded_string) + 1)) != NULL) {
+  if ((endpoint = malloc(strlen(args->endpoint) + strlen(encoded_string) + 1)) != NULL)
+	{
     endpoint[0] = '\0';
 
     strcat(endpoint, args->endpoint);
@@ -215,6 +272,15 @@ build_search_query(struct scpotify_context *args)
   return endpoint;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 char * 
 build_put_request(char *album_info, char* album_position) 
 {
@@ -243,13 +309,24 @@ build_put_request(char *album_info, char* album_position)
     strcat(jsonObj, json_obj_mid);
     strcat(jsonObj, offset);
     strcat(jsonObj, json_obj_end);
-  } else {
+  }
+	else
+	{
     printf("malloc failed!\n");
   }
 
   return jsonObj;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 char * 
 build_put_request_playlist(char *playlist_uri, int album_position) 
 {
@@ -275,13 +352,24 @@ build_put_request_playlist(char *playlist_uri, int album_position)
     strcat(jsonObj, json_obj_mid);
     strcat(jsonObj, offset);
     strcat(jsonObj, json_obj_end);
-  } else {
+  }
+	else
+	{
     printf("malloc failed!\n");
   }
 
   return jsonObj;
 }
 
+/**
+ * this function actually gets called multiple times, it gets called
+ * as many times as there are still packets to be received. 
+ * @param contents - the actual data, can be jsom or html
+ * @param size - idk actually lol, but its always 1
+ * @param nmemb - the size of the received packet
+ * @param user_struct - the struct that we will write to eventually
+ * @return size of the packet
+ */
 char * 
 build_put_request_episode(char *show_uri, char *number_of_episodes,int show_position) 
 {
@@ -311,7 +399,9 @@ build_put_request_episode(char *show_uri, char *number_of_episodes,int show_posi
     strcat(jsonObj, json_obj_mid);
     strcat(jsonObj, offset);
     strcat(jsonObj, json_obj_end);
-  } else {
+  }
+	else
+	{
     printf("malloc failed!\n");
   }
 

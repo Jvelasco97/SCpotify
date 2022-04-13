@@ -19,6 +19,7 @@ void parse_related_artists(char *);
 void parse_searched_artists(char *);
 void parse_albums(char *);
 void parse_shows(char *);
+void parse_device_list(char *);
 void parse_podcast_episodes(char *);
 char *insert_parsed_data(char **, const char **, int, bool);
 char *insert_parsed_queue_data(char **, const char **, int);

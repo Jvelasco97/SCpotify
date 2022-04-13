@@ -23,7 +23,7 @@ print_help()
     "   -b                  \t\t goes back to previous track.\n"
     "   -e                  \t\t fetch podcast episodes.\n"
     "   -s \"example song\" \t\t displays top 5 songs from query.\n"
-    "   -s art \"example artist\" \t\t displays top 5 artists from query.\n"
+    "   -a \"example artist\" \t\t displays top 5 artists from query.\n"
     "   -q \"example song\" \t\t displays top 5 songs from query & adds it "
     "to your player.\n"
     "   -t                  \t\t displays previous 20 songs & prompts choice "
@@ -192,7 +192,7 @@ process_args(int argc, char **argv, struct scpotify_context *args)
     /* resume player -- PUT*/
     case 'r':
       printf("\nNow resuming\n");
-      set_spotify_context(args, "https://api.spotify.com/v1/me/player/play?device_id=b49a5780a99ea81284fc0746a78f84a30e4d5c73",
+      set_spotify_context(args, "https://api.spotify.com/v1/me/player/play",
                        SPOTIFY_PLAY, PUT);
       break;
     /* next track -- POST*/
