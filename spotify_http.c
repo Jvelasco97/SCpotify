@@ -140,6 +140,7 @@ spotify_http(struct scpotify_context *args) {
   CURLcode res = 0;
   struct curl_slist *headers = NULL;
   long http_code = 0;
+
   char *append_header = "Authorization: Bearer ";
 
   args->auth_struct->auth_token[AUTH_TOKEN_LENGHT] = 0;
@@ -168,6 +169,7 @@ spotify_http(struct scpotify_context *args) {
 
   curl_easy_cleanup(curl);
   curl_slist_free_all(headers);
+
   free(header);
 
   return http_code;

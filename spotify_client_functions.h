@@ -6,7 +6,7 @@
 void get_config_values(spotify_auth_payload *);
 void regenerate_token(scpotify_context *);
 void transfer_playback(scpotify_context *);
-void handle_token_regen(scpotify_context *, u_int8_t , char *);
+void refresh_oath_token_and_resume(scpotify_context *, u_int8_t , char *);
 void spotify_show_current_song(scpotify_context *);
 void spotify_display_tops(scpotify_context *);
 void spotify_play_podcast(scpotify_context *);
@@ -25,8 +25,11 @@ void spotify_add_song_queue(scpotify_context *, spotify_song_query_info);
 void spotifyC(scpotify_context *, spotify_song_query_info);
 void init_search(spotify_search_context *);
 void init_cmd_args(scpotify_context *);
+void free_refreshed_token(char *);
 void free_auth_payload(scpotify_context *);
 void free_args_and_search(scpotify_context *, spotify_search_context *, spotify_auth_payload *);
 void free_previous_context(scpotify_context **);
+void free_spotify_json_response(char *);
+void free_spotify_json_data(char *);
 
 #endif
