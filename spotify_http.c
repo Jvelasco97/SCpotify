@@ -291,7 +291,7 @@ build_put_request(char *album_info, char* album_position)
   pos--;
  
   /* turn the int to a char again */
-  char offset[5];
+  char offset[20];
   sprintf(offset, "%d", pos);
 
   char *jsonObj;

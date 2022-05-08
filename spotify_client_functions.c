@@ -276,10 +276,10 @@ spotify_show_current_song(struct scpotify_context *cmd_args)
   /* spotify_http(cmd_args); */
   parse_currently_playing(cmd_args->search_struct->spotify_json_response);
 
-  printList();
+  spotify_now_playing_list();
 
   /* cleanup */
-  clear_search_list();
+  clear_song_info_list();
 }
 
 /**
@@ -313,7 +313,7 @@ spotify_display_tops(struct scpotify_context *cmd_args)
   }
 
   parse_top_artists(cmd_args->search_struct->spotify_json_response);
-  print_top_tracks();
+  print_top_tracks_list();
 
 	free_spotify_json_response(cmd_args->search_struct->spotify_json_response);
 }
@@ -331,8 +331,7 @@ void
 cleanup_playlist(scpotify_context *cmd_args)
 {
   free(cmd_args->search_struct->spotify_json_response);
-  free(cmd_args->search_struct->spotify_json_data);
-  clear_playlist();
+  clear_playlist_list();
 }
 
 /**
@@ -352,7 +351,7 @@ change_playlist_to_play_command(scpotify_context *cmd_args)
   free_spotify_endpoint(cmd_args->endpoint);
 
   cmd_args->endpoint = parse_selected_playlist_json(cmd_args->search_struct->spotify_json_response);
-  u_int8_t playlist_position = print_playlist_songs();
+  u_int8_t playlist_position = print_playlist_songs_list();
   cmd_args->search_struct->spotify_json_data = build_put_request_playlist(cmd_args->endpoint, playlist_position);
 
   cmd_args->http_type = PUT;
@@ -361,6 +360,48 @@ change_playlist_to_play_command(scpotify_context *cmd_args)
   free_spotify_endpoint(cmd_args->endpoint);
 
   cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play";
+}
+
+void
+spotify_retrieve_playlists(scpotify_context *cmd_args)    
+{
+  /* retrieve all playlists */
+  if (spotify_http(cmd_args) != STATUS_OK)
+	{
+    /* modify auth struct */
+    refresh_oauth_token_and_resume(cmd_args, GET, cmd_args->endpoint);
+  }
+
+  parse_playlist_json(cmd_args->search_struct->spotify_json_response);
+  free_spotify_json_response(cmd_args->search_struct->spotify_json_response);
+
+  /* get the playlist uri for the playlist endpoint */
+  cmd_args->search_struct->search_query = print_playlist_list();
+  cmd_args->endpoint = "https://api.spotify.com/v1/playlists/";
+
+  /* append the search query and endpoint */
+  cmd_args->endpoint = build_search_query(cmd_args);
+}
+
+void
+spotify_display_playlist_songs_and_select(scpotify_context *cmd_args)
+{
+  /* retrieve all songs from specific playlist */
+  if (spotify_http(cmd_args) != STATUS_OK)
+	{
+    /* modify auth struct */
+    refresh_oauth_token_and_resume(cmd_args, GET, cmd_args->endpoint);
+  }
+
+  change_playlist_to_play_command(cmd_args);
+
+  if (spotify_http(cmd_args) != STATUS_OK)
+	{
+    /* modify auth struct */
+    refresh_oauth_token_and_resume(cmd_args, GET, cmd_args->endpoint);
+  }
+
+  cleanup_playlist(cmd_args);
 }
 
 /**
@@ -374,35 +415,8 @@ change_playlist_to_play_command(scpotify_context *cmd_args)
  */
 void spotify_play_playlist(struct scpotify_context *cmd_args)
 {
-  /* retrieve all playlists */
-  if (spotify_http(cmd_args) != STATUS_OK)
-	{
-    /* modify auth struct */
-    refresh_oauth_token_and_resume(cmd_args, GET, cmd_args->endpoint);
-  }
-
-  parse_playlist_json(cmd_args->search_struct->spotify_json_response);
-  free_spotify_json_response(cmd_args->search_struct->spotify_json_response);
-
-  /* get the playlist uri for the playlist endpoint */
-  cmd_args->search_struct->search_query = print_playlist();
-  cmd_args->endpoint = "https://api.spotify.com/v1/playlists/";
-
-  /* append the search query and endpoint */
-  cmd_args->endpoint = build_search_query(cmd_args);
-
-  /* retrieve all songs from specific playlist */
-  if (spotify_http(cmd_args) != STATUS_OK)
-	{
-    /* modify auth struct */
-    refresh_oauth_token_and_resume(cmd_args, GET, cmd_args->endpoint);
-  }
-
-  change_playlist_to_play_command(cmd_args);
-
-  spotify_http(cmd_args);
-
-  cleanup_playlist(cmd_args);
+	spotify_retrieve_playlists(cmd_args);
+	spotify_display_playlist_songs_and_select(cmd_args);
 }
 
 void
@@ -459,7 +473,7 @@ cleanup_related_artists(scpotify_context *cmd_args)
 {
   free(cmd_args->endpoint);
   free(cmd_args->search_struct->spotify_json_response);
-  clear_related_artists();
+  clear_related_artists_list();
 }
 
 /**
@@ -489,7 +503,7 @@ spotify_show_related_artists(scpotify_context *cmd_args)
   }
 
   parse_related_artists(cmd_args->search_struct->spotify_json_response);
-  print_related_artists();
+  print_related_artists_list();
 
   cleanup_related_artists(cmd_args);
 }
@@ -498,6 +512,49 @@ void
 free_spotify_json_data(char *data)
 {
 	free(data);
+}
+
+void
+spotify_display_available_songs(scpotify_context *cmd_args, spotify_song_query_info *req)
+{
+  /* build endpoint for search & parse needed info*/
+  cmd_args->endpoint = build_search_query(cmd_args);
+
+  if (spotify_http(cmd_args) != STATUS_OK)
+	{
+    /* modify auth struct */
+    refresh_oauth_token_and_resume(cmd_args, GET, cmd_args->endpoint);
+  }
+
+  parse_search_info(cmd_args->search_struct->spotify_json_response);
+	print_available_songs_list(5, req);
+  /* free_spotify_json_response(cmd_args->search_struct->spotify_json_response); */
+  free_spotify_endpoint(cmd_args->endpoint);
+}
+
+void
+spotify_set_player_context_for_play_song(scpotify_context *cmd_args, spotify_song_query_info *req)
+{
+  cmd_args->http_type = PUT;
+  cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play?device=25c86e6bbd56ddea209ff30b89abe3bbaeda06b4";
+  cmd_args->search_struct->spotify_json_data = build_put_request(req->track_info, req->track_position);
+  cmd_args->enable_write = false;
+}
+
+void
+spotify_set_player_to_play_song(scpotify_context *cmd_args, spotify_song_query_info *req)
+{
+
+	spotify_set_player_context_for_play_song(cmd_args, req);
+	
+  if (spotify_http(cmd_args) != STATUS_OK)
+	{
+    /* modify auth struct */
+    refresh_oauth_token_and_resume(cmd_args, GET, cmd_args->endpoint);
+  }
+
+  /* free_spotify_json_data(cmd_args->search_struct->spotify_json_data); */
+  /* clear_song_info_list(); */
 }
 
 /**
@@ -510,35 +567,10 @@ free_spotify_json_data(char *data)
  * @return size of the packet
  */
 void
-spotify_play_song(scpotify_context *cmd_args, spotify_song_query_info req)
+spotify_play_song(scpotify_context *cmd_args, spotify_song_query_info *req)
 {
-  /* build endpoint for search & parse needed info*/
-  cmd_args->endpoint = build_search_query(cmd_args);
-
-  if (spotify_http(cmd_args) != STATUS_OK)
-	{
-    /* modify auth struct */
-    refresh_oauth_token_and_resume(cmd_args, GET, cmd_args->endpoint);
-  }
-
-
-  parse_search_info(cmd_args->search_struct->spotify_json_response);
-  req = print_avaible_songs(5);
-  free_spotify_json_response(cmd_args->search_struct->spotify_json_response);
-
-  /* once we have the neccesary info, we change the endpoint and request */
-  cmd_args->http_type = PUT;
-
-  free_spotify_endpoint(cmd_args->endpoint);
-  cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play?device=25c86e6bbd56ddea209ff30b89abe3bbaeda06b4";
-
-  cmd_args->search_struct->spotify_json_data = build_put_request(req.track_info, req.track_position);
-
-  cmd_args->enable_write = false;
-  spotify_http(cmd_args);
-
-  free_spotify_json_data(cmd_args->search_struct->spotify_json_data);
-  clear_search_list();
+	spotify_display_available_songs(cmd_args, req);
+	spotify_set_player_to_play_song(cmd_args, req);
 }
 
 void
@@ -564,7 +596,7 @@ spotify_set_podcast_episode_context(scpotify_context *cmd_args)
     .podcast_id = NULL,
   };
 
-  query = print_show_search_results(query);
+  query = print_show_search_results_list(query);
   char *podcast_url = "https://api.spotify.com/v1/shows/";
   podcast_url = concat_strings(podcast_url, query.podcast_id);
   cmd_args->endpoint = concat_strings(podcast_url, "/episodes");
@@ -576,7 +608,7 @@ spotify_set_podcast_episode_context(scpotify_context *cmd_args)
 
   /* once we have the neccesary info, we change the endpoint and request */
   parse_podcast_episodes(cmd_args->search_struct->spotify_json_response);
-  u_int16_t position = print_podcast_episodes();
+  u_int16_t position = print_podcast_episodes_list();
   printf("Returned %d\n", position);
 
   free_spotify_endpoint(cmd_args->endpoint);
@@ -594,7 +626,6 @@ spotify_play_podcast_episode(scpotify_context *cmd_args)
   spotify_http(cmd_args);
 
   free_spotify_json_data(cmd_args->search_struct->spotify_json_data);
-  /* clear_search_list(); */
 }
 
 
@@ -634,7 +665,7 @@ spotify_lookup_artists(scpotify_context *cmd_args)
 void
 spotify_query_selected_artist(scpotify_context *cmd_args)
 {
-  char *artist_id = print_searched_artists();
+  char *artist_id = print_searched_artists_list();
 
   char *top_tracks_url = "https://api.spotify.com/v1/artists/";
   top_tracks_url = concat_strings(top_tracks_url, artist_id);
@@ -655,7 +686,7 @@ spotify_query_selected_artist(scpotify_context *cmd_args)
 }
 
 void
-spotify_set_context_to_play_from_artist_search(scpotify_context *cmd_args, spotify_song_query_info req)
+spotify_set_context_to_play_from_artist_search(scpotify_context *cmd_args, spotify_song_query_info *req)
 {
   if (spotify_http(cmd_args) != STATUS_OK)
 	{
@@ -664,13 +695,13 @@ spotify_set_context_to_play_from_artist_search(scpotify_context *cmd_args, spoti
   }
 
   parse_albums(cmd_args->search_struct->spotify_json_response);
-  req = print_searched_artist_results(10);
+  print_searched_artist_results_list(10, req);
 
   /* /\* once we have the neccesary info, we change the endpoint and request *\/ */
   cmd_args->http_type = PUT;
   cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play";
   cmd_args->search_struct->spotify_json_data =
-  build_put_request(req.track_info, req.track_position);
+  build_put_request(req->track_info, req->track_position);
 }
 
 void
@@ -692,7 +723,7 @@ spotify_play_song_from_selected_artist(scpotify_context *cmd_args)
  * @return size of the packet
  */
 void
-spotify_play_searched_artist(scpotify_context *cmd_args, spotify_song_query_info req)
+spotify_play_searched_artist(scpotify_context *cmd_args, spotify_song_query_info *req)
 {
 
 	spotify_lookup_artists(cmd_args);
@@ -714,16 +745,16 @@ spotify_play_searched_artist(scpotify_context *cmd_args, spotify_song_query_info
  * @return size of the packet
  */
 void
-recents_change_to_play(scpotify_context *cmd_args, spotify_song_query_info req)
+recents_change_to_play(scpotify_context *cmd_args, spotify_song_query_info *req)
 {
   cmd_args->http_type = PUT;
   cmd_args->enable_write = false;
   cmd_args->endpoint = "https://api.spotify.com/v1/me/player/play";
-  cmd_args->search_struct->spotify_json_data = build_put_request(req.track_info, req.track_position);
+  cmd_args->search_struct->spotify_json_data = build_put_request(req->track_info, req->track_position);
 }
 
 void
-spotify_query_recent_songs(scpotify_context *cmd_args, spotify_song_query_info req)
+spotify_query_recent_songs(scpotify_context *cmd_args, spotify_song_query_info *req)
 {
   /* build endpoint for search & parse needed info*/
   if (spotify_http(cmd_args) != STATUS_OK)
@@ -733,7 +764,7 @@ spotify_query_recent_songs(scpotify_context *cmd_args, spotify_song_query_info r
   }
 
   parse_search_info(cmd_args->search_struct->spotify_json_response);
-  req = print_avaible_songs(20);
+	print_available_songs_list(20, req);
 
   recents_change_to_play(cmd_args, req);
 }
@@ -747,7 +778,7 @@ spotify_play_recent_song(scpotify_context *cmd_args)
     refresh_oauth_token_and_resume(cmd_args, GET, cmd_args->endpoint);
   }
 
-  clear_search_list();
+  clear_song_search_list();
 }
 
 /**
@@ -760,7 +791,7 @@ spotify_play_recent_song(scpotify_context *cmd_args)
  * @return size of the packet
  */
 void
-spotify_play_recents(struct scpotify_context *cmd_args, struct spotify_song_query_info req)
+spotify_play_recents(struct scpotify_context *cmd_args, struct spotify_song_query_info *req)
 {
 	spotify_query_recent_songs(cmd_args, req);
 	spotify_play_recent_song(cmd_args);
@@ -776,10 +807,10 @@ spotify_play_recents(struct scpotify_context *cmd_args, struct spotify_song_quer
  * @return size of the packet
  */
 void
-change_queue_to_play(scpotify_context *cmd_args, spotify_song_query_info req)
+change_queue_to_play(scpotify_context *cmd_args, spotify_song_query_info *req)
 {
   cmd_args->search_struct->query_type = SONG_QUERY;
-  cmd_args->search_struct->search_query = req.track_info;
+  cmd_args->search_struct->search_query = req->track_info;
   cmd_args->http_type = POST;
   cmd_args->enable_write = false;
 
@@ -797,7 +828,7 @@ change_queue_to_play(scpotify_context *cmd_args, spotify_song_query_info req)
  * @return size of the packet
  */
 void
-spotify_add_song_queue(struct scpotify_context *cmd_args, struct spotify_song_query_info req)
+spotify_add_song_queue(struct scpotify_context *cmd_args, struct spotify_song_query_info *req)
 {
   /* fetch songs and parse */
   cmd_args->search_struct->query_type = SONG_QUERY;
@@ -809,7 +840,7 @@ spotify_add_song_queue(struct scpotify_context *cmd_args, struct spotify_song_qu
   }
 
   parse_queue_search_info(cmd_args->search_struct->spotify_json_response);
-  req = print_avaible_songs(5);
+  print_available_songs_list(5, req);
   free_spotify_endpoint(cmd_args->endpoint);
 
   /* once we have the neccesary info, we change the endpoint and request */
@@ -834,7 +865,7 @@ spotify_add_song_queue(struct scpotify_context *cmd_args, struct spotify_song_qu
  * @return size of the packet
  */
 void
-spotifyC(struct scpotify_context *cmd_args, struct spotify_song_query_info req) 
+spotifyC(scpotify_context *cmd_args, spotify_song_query_info *req) 
 {
   switch (cmd_args->spotify_command)
   {

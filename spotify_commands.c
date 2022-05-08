@@ -49,14 +49,14 @@ set_spotify_context(struct scpotify_context *args, char *endpoint, int command, 
 }
 
 void 
-enable_write_context(struct scpotify_context *args) 
+enable_write_to_context(struct scpotify_context *args) 
 {
   args->enable_write = true;
   args->search_struct->search_query = optarg;
 }
 
 static 
-void change_player_status(struct scpotify_context *args) 
+void change_player_state(struct scpotify_context *args) 
 {
   args->spotify_command = SPOTIFY_MODIFY_PLAYER;
   args->search_struct->spotify_json_data = "{}";
@@ -64,7 +64,7 @@ void change_player_status(struct scpotify_context *args)
 }
 
 void 
-handle_case_zero(const char *option, struct scpotify_context *args) 
+handle_long_options(const char *option, struct scpotify_context *args) 
 {
   if (strcmp("repeat", option) == 0) 
   {
@@ -78,7 +78,7 @@ handle_case_zero(const char *option, struct scpotify_context *args)
       args->endpoint = 
 	  "https://api.spotify.com/v1/me/player/repeat?state=off";
     }
-    change_player_status(args);
+    change_player_state(args);
   } 
 
   else if (strcmp("shuffle", option) == 0) 
@@ -94,14 +94,14 @@ handle_case_zero(const char *option, struct scpotify_context *args)
           "https://api.spotify.com/v1/me/player/shuffle?state=false";
     }
 
-    change_player_status(args);
+    change_player_state(args);
   }
 
   else if (strcmp("seek", option) == 0) 
   {
     args->endpoint = "https://api.spotify.com/v1/me/player/seek?position_ms=";
     args->endpoint = concat_strings(args->endpoint, optarg);
-    change_player_status(args);
+    change_player_state(args);
   }
 
   else if (strcmp("vol", option) == 0) 
@@ -109,7 +109,7 @@ handle_case_zero(const char *option, struct scpotify_context *args)
     args->endpoint =
         "https://api.spotify.com/v1/me/player/volume?volume_percent=";
     args->endpoint = concat_strings(args->endpoint, optarg);
-    change_player_status(args);
+    change_player_state(args);
   } 
 
   else if (strcmp("plist", option) == 0) 
@@ -181,7 +181,7 @@ process_args(int argc, char **argv, struct scpotify_context *args)
       exit(EXIT_FAILURE);
       break;
     case 0:
-      handle_case_zero(long_options[option_index].name, args);
+      handle_long_options(long_options[option_index].name, args);
       break;
     /* pause player  -- PUT*/
     case 'p':
@@ -215,14 +215,14 @@ process_args(int argc, char **argv, struct scpotify_context *args)
       set_spotify_context(
           args, "https://api.spotify.com/v1/search?q=", SPOTIFY_SEARCH_SONGS, GET);
 
-      enable_write_context(args);
+      enable_write_to_context(args);
       args->search_struct->query_type = SONG_QUERY;
       break;
     case 'a':
       printf("\nSearching for artist...\n\n");
       args->endpoint = "https://api.spotify.com/v1/search?q=";
       set_spotify_context(args, "https://api.spotify.com/v1/search?q=", SPOTIFY_SEARCH_ARTISTS, GET);
-      enable_write_context(args);
+      enable_write_to_context(args);
       args->search_struct->query_type = ARTIST_QUERY;
       break;
     case 't':
@@ -238,7 +238,7 @@ process_args(int argc, char **argv, struct scpotify_context *args)
       set_spotify_context(
           args, "https://api.spotify.com/v1/search?q=", SPOTIFY_SEARCH_PODCASTS, GET);
 
-      enable_write_context(args);
+      enable_write_to_context(args);
       args->search_struct->query_type = PODCAST_QUERY;
       break;
     case 'q':
@@ -246,7 +246,7 @@ process_args(int argc, char **argv, struct scpotify_context *args)
           "\nSearching for a song that you want to add to the player...\n\n");
       set_spotify_context(
           args, "https://api.spotify.com/v1/search?q=", SPOTIFY_QUEUE, GET);
-      enable_write_context(args);
+      enable_write_to_context(args);
       args->search_struct->query_type = DEFAULT_QUERY;
       break;
     case 'h':

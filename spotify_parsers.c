@@ -93,7 +93,7 @@ parse_currently_playing(char *json_web_data)
     /* add offset of 5 characters */
     char *ptr = json_position + 6;
 
-    insert_node(ptr, distance);
+    insert_song_info_node(ptr, distance);
 
     /* reset the json string */
     json_position[distance] = ' ';
